@@ -20,7 +20,7 @@ export default function Page() {
   	] = useSignInWithEmailAndPassword(auth);
 
   	if (user) {
-  		router.push("/account");
+  		router.push("/");
   		return;
   	}
 
