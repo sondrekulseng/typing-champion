@@ -1,40 +1,28 @@
 "use client";
 
-import { Button } from '@mantine/core';
-import { auth } from "/firebase.config";
-import { useRouter } from 'next/navigation'
-import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { useState } from 'react';
-import { Skeleton } from '@mantine/core';
+import { auth } from "/firebase.config"
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { useState } from 'react'
+import { Skeleton } from '@mantine/core'
+import SignOutButton from './signOutButton'
 
 export default function Page() {
-	const [isLoading, setLoading] = useState(true);
-	const [email, setEmail] = useState();
-	const router = useRouter();
+	const [user, loading, error] = useAuthState(auth)
 
-	onAuthStateChanged(auth, loggedInUser => {
-		if (!loggedInUser) {
-			router.push("/login")
-			return
-		} 
-		setLoading(false);
-		setEmail(loggedInUser.email);
-	})
-
-	function logOut() {
-		signOut(auth)
-			.then(() => router.push("/login"))
-			.catch(error => alert(error.message));
-	}
-
-	if (isLoading) {
+	if (loading) {
 		return <Skeleton height={8} mt={6} height={30} width="50%" />
 	}
 
-	return (
-		<>
-			<h3>Hello {email}!</h3>
-			<Button onClick={logOut}>Sign out</Button>
-		</>
-	)
+	if (error) {
+		return <p>Error occured</p>
+	}
+
+	if (user) {
+		return (
+			<>
+				<h3>Hello {user.email}!</h3>
+				<SignOutButton />
+			</>
+		)
+	}
 }
