@@ -10,6 +10,8 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import { collection } from 'firebase/firestore';
 import TextData from './TextData'
 import { useState } from 'react'
+import { useDisclosure } from '@mantine/hooks'
+import { Modal, Button, Alert } from '@mantine/core'
 
 export default function Home() {
   let texts = new Map<string, TextData>()
@@ -22,6 +24,7 @@ export default function Home() {
   const [userInput, setUserInput] = useState("")
   const [totalCharLength, setTotalCharLength] = useState(0)
   const [wordCorrectCharIndex, setWordCorrectCharIndex] = useState(0)
+  const [gameFinished, setGameFinished] = useState(false)
   const [snapshot, loading, error] = useCollection(
     collection(db, 'texts'),
     {
@@ -63,9 +66,9 @@ export default function Home() {
     const userChar: char = userInput.charAt(userInput.length - 1)
     const answerChar: char = textContent.charAt(correctChars)
 
-
     console.log("Correct word char: " + wordCorrectCharIndex)
     console.log("User input length: " + userInput.length)
+
     if (wordCorrectCharIndex != userInput.length - 1) {
       console.log("Ignore")
       return
@@ -74,10 +77,12 @@ export default function Home() {
     if (correctChars == totalCharLength) {
       setUserInput("")  
       console.log("Game finished")
+      setGameFinished(true)
       return
     }
 
     if (userChar == answerChar) {
+      setCorrectChars(correctChars + 1)
       if (userChar == " ") {
         setWordCount(wordCount + 1)
         setUserInput("")
@@ -86,7 +91,6 @@ export default function Home() {
       } else {
         setWordCorrectCharIndex(wordCorrectCharIndex + 1)
       }
-      setCorrectChars(correctChars + 1)
     } else {
       setErrorCount(errorCount + 1)
     }
@@ -116,6 +120,12 @@ export default function Home() {
             checkText(e.target.value)
           }} 
           value={userInput} />
+        {gameFinished ? 
+          <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
+            You finished the game!
+          </Alert>
+          : ""
+        }
       </>
   );
 }
