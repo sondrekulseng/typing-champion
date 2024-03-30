@@ -27,8 +27,8 @@ export default function Home() {
   if (loading) {
     return (
       <>
-        <Skeleton height={8} radius="xl" />
-        <Skeleton height={8} mt={6} radius="xl" />
+        <Skeleton height={40} width={400} radius="xl" />
+        <Skeleton height={40} width={800} radius="xl" />
       </>
     )
   }
@@ -60,6 +60,7 @@ export default function Home() {
               label="Choose a text"
               data={options} 
               onChange={(value, option) => getTextByKey(value)}
+              placeholder="Search after a text..."
               searchable
             />
             {textData != null
