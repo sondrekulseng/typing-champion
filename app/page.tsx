@@ -12,13 +12,14 @@ import TextData from './TextData'
 import { useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Button, Alert } from '@mantine/core'
+import Scores from './Scores'
 
 export default function Home() {
   let texts = new Map<string, TextData>()
   const [answerIndex, setAnswerIndex] = useState(0)
   const [correctChars, setCorrectChars] = useState(0)
-  const [textData, setTextData] = useState();
-  const [textContent, setTextContent] = useState("");
+  const [textData, setTextData] = useState()
+  const [textContent, setTextContent] = useState("")
   const [errorCount, setErrorCount] = useState(0)
   const [wordCount, setWordCount] = useState(0)
   const [userInput, setUserInput] = useState("")
@@ -47,12 +48,17 @@ export default function Home() {
 
   if (snapshot) {
     snapshot.forEach(doc => {
-      texts.set(doc.id, new TextData(doc.data().title, doc.data().content))
+      texts.set(doc.id, new TextData(
+        doc.id,
+        doc.data().title, 
+        doc.data().content)
+      )
     })
   }
 
   function getTextByKey(key: string) {
     const textData: TextData = texts.get(key)
+    setGameFinished(false)
     setCorrectChars(0)
     setWordCount(0)
     setWordCorrectCharIndex(0)
@@ -60,6 +66,7 @@ export default function Home() {
     setTextData(textData)
     setTextContent(textData.content)
     setTotalCharLength(textData.content.length - 1)
+    setTextId(textData.id)
   }
 
   function checkText(userInput: string) {
@@ -70,7 +77,6 @@ export default function Home() {
     console.log("User input length: " + userInput.length)
 
     if (wordCorrectCharIndex != userInput.length - 1) {
-      console.log("Ignore")
       return
     }
 
@@ -78,6 +84,7 @@ export default function Home() {
       setUserInput("")  
       console.log("Game finished")
       setGameFinished(true)
+      setWordCount(wordCount + 1)
       return
     }
 
@@ -96,9 +103,15 @@ export default function Home() {
     }
   }
 
+  function calcAccuracy(): Number {
+    let totalChars = textContent.length;
+    return 100 - (errorCount / totalChars * 100);
+  }
+
   let options = Array.from(texts).map(([key, value]) => ({ value: key, label: value.title }));
   return (
       <>
+        <div style={{float: 'left', width: '70%'}}>
         <h1>Typing champion</h1>
         <Select
           label="Choose a text"
@@ -122,10 +135,14 @@ export default function Home() {
           value={userInput} />
         {gameFinished ? 
           <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
-            You finished the game!
+            <h3>Words typed: {wordCount}</h3>
+            <h3>Errors: {errorCount}</h3>
+            <h3>Accuracy: {calcAccuracy()} %</h3>
           </Alert>
           : ""
         }
+        </div>
+        <Scores textId={"MSU3NBTCoSNniD3PPyFN"}/>
       </>
   );
 }
