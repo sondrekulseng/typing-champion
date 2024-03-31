@@ -20,7 +20,7 @@ export default function RootLayout({
         <style>{`
           body {
             margin: auto;
-            width: 80%;
+            width: 85%;
           }
         `}</style>
       </head>
