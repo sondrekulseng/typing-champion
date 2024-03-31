@@ -35,8 +35,9 @@ export default function ScoreTable(props: Props) {
 	}
 
 	if (snapshot) {
-		const rows = snapshot.docs.map((doc) => (
+		const rows = snapshot.docs.map((doc, index) => (
     		<Table.Tr key={doc.id}>
+    			<Table.Td>{index + 1}</Table.Td>
       			<Table.Td>{doc.data().userEmail}</Table.Td>
       			<Table.Td>{doc.data().wpm}</Table.Td>
       			<Table.Td>{doc.data().accuracy}%</Table.Td>
@@ -46,6 +47,7 @@ export default function ScoreTable(props: Props) {
 			<Table>
       			<Table.Thead>
         			<Table.Tr>
+        				<Table.Th>#</Table.Th>
           				<Table.Th>User</Table.Th>
           				<Table.Th>WPM</Table.Th>
           				<Table.Th>Accuracy</Table.Th>
