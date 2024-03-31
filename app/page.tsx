@@ -5,7 +5,7 @@ import { auth, db } from "/firebase.config"
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { Skeleton } from '@mantine/core'
 import { useRouter } from 'next/navigation'
-import { Select } from '@mantine/core'
+import { Select, Alert, Link} from '@mantine/core'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { collection } from 'firebase/firestore';
 import TextData from './TextData'
@@ -17,7 +17,6 @@ import TypingGame from './TypingGame'
 export default function Home() {
   let texts = new Map<string, TextData>()
   const [textData, setTextData] = useState<TextData>()
-  const [userEmail, setUserEmail] = useState()
   const [snapshot, loading, error] = useCollection(
     collection(db, 'texts'),
     {
@@ -25,8 +24,6 @@ export default function Home() {
     }
   );
   const [user, userLoad, userError] = useAuthState(auth)
-
-
 
   if (loading) {
     return (
@@ -65,17 +62,18 @@ export default function Home() {
               data={options} 
               onChange={(value, option) => getTextByKey(value)}
               placeholder="Search after a text..."
+              selectFirstOptionOnChange={true}
               searchable
             />
             {textData != null
-              ? <TypingGame textData={textData} userEmail={user ? user.email : undefined}/>
+              ? <TypingGame textData={textData} user={user}/>
               : "" 
             }
         </div>
         <div style={{float: 'right', width: '25%'}}>
           <h1>Scores</h1>
           {textData != null
-            ? <ScoreTable textId={textData.id} userEmail={user ? user.email : undefined}/>
+            ? <ScoreTable textId={textData.id} user={user} />
             : ""
           }
         </div>

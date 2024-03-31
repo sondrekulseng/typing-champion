@@ -4,10 +4,11 @@ import { TextInput, Alert, Button } from '@mantine/core';
 import { useEffect } from 'react'
 import { collection, addDoc } from "firebase/firestore"; 
 import { auth, db } from "/firebase.config"
+import firebase from "firebase/app"
 
 type Props = {
 	textData: TextData,
-	userEmail: string | undefined
+	user: Firebase.User | undefined
 }
 
 export default function TypingGame(props: Props) {
@@ -91,7 +92,7 @@ export default function TypingGame(props: Props) {
   	function submitScore() {
   		addDoc(collection(db, "scores"), {
   			textId: textData.id,
-  			userEmail: user,
+  			userEmail: props.user.email,
   			wpm: wpm,
   			accuracy: accuracy
   		})
@@ -127,7 +128,7 @@ export default function TypingGame(props: Props) {
             		<h3>Elapsed time: {seconds}s</h3>	
             		<h3>WPM: {wpm}</h3>
             		<h3>Accuracy: {accuracy} %</h3>
-            		{user 
+            		{props.user != undefined 
             			? <Button onClick={submitScore}>Submit score</Button>
             			: ""
             		}

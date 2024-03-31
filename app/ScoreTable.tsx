@@ -4,31 +4,51 @@ import { useCollection } from 'react-firebase-hooks/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db } from "/firebase.config"
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
-import React from 'react'
-import { Skeleton, Table, TableColumn, Alert } from '@mantine/core'
-import { useState } from 'react'
+import firebase from "firebase/app"
+import { Skeleton, Table, TableColumn, Alert, Checkbox } from '@mantine/core'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 type Props = {
 	textId: string,
-	userEmail: string | undefined
+	user: Firebase.User | undefined
 }
 export default function ScoreTable(props: Props) {
 
+	const [showPersonalScores, setShowPersonalScores] = useState(false);
 	const [scores, setScores] = useState([]);
-	const [snapshot, loading, error] = useCollection(
+	const [scoreQuery, setScoreQuery] = useState(
 		query(
 			collection(db, 'scores'), 
 			where("textId", "==", props.textId),
 			orderBy("wpm", "desc"),
 			limit(10)
 		)
-	);
+	)
+	const [snapshot, loading, error] = useCollection(scoreQuery);
 
-	if (props.userEmail == undefined) {
-		return <Alert variant="light" color="blue" title="Not logged in">
-			<Link href="/login">Login</Link> or <Link href="/signup">sign up</Link> to view and submit scores</Alert>
-	}
+	useEffect(() => {
+		if (showPersonalScores) {
+			setScoreQuery(
+				query(
+					collection(db, 'scores'), 
+					where("textId", "==", props.textId),
+					where("userEmail", "==", props.user.email),
+					orderBy("wpm", "desc"),
+					limit(10)
+				)
+			)
+		} else {
+			setScoreQuery(
+				query(
+					collection(db, 'scores'), 
+					where("textId", "==", props.textId),
+					orderBy("wpm", "desc"),
+					limit(10)
+				)
+			)
+		}
+	}, [showPersonalScores, props])
 
 	if (loading) {
 		return <p>Loading scores...</p>
@@ -44,7 +64,8 @@ export default function ScoreTable(props: Props) {
     		</Table.Tr>
   		));
 		return (
-			<Table>
+			<>
+			<Table style={{marginBottom: '1em'}}>
       			<Table.Thead>
         			<Table.Tr>
         				<Table.Th>#</Table.Th>
@@ -55,6 +76,13 @@ export default function ScoreTable(props: Props) {
       			</Table.Thead>
       			<Table.Tbody>{rows}</Table.Tbody>
     		</Table>
+    		{props.user == undefined
+    			? <Alert variant="light" color="blue" title="Not logged in">
+                	<Link href="/login">Login</Link> or <Link href="/signup">sign up</Link> to view personal scores
+              	  </Alert>
+              	: <Checkbox label="Only show personal scores" checked={showPersonalScores} onChange={evt => setShowPersonalScores(evt.currentTarget.checked)} />
+          	}
+          	</>
 		)
 	}
 
