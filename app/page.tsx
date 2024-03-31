@@ -17,12 +17,14 @@ import TypingGame from './TypingGame'
 export default function Home() {
   let texts = new Map<string, TextData>()
   const [textData, setTextData] = useState<TextData>()
+  const [userEmail, setUserEmail] = useState()
   const [snapshot, loading, error] = useCollection(
     collection(db, 'texts'),
     {
       snapshotListenOptions: { includeMetadataChanges: true },
     }
   );
+  const [user, userLoad, userError] = useAuthState(auth)
 
   if (loading) {
     return (
@@ -63,13 +65,13 @@ export default function Home() {
               placeholder="Search after a text..."
               searchable
             />
-            {textData != null
-              ? <TypingGame textData={textData}/>
+            {textData != null && user != null
+              ? <TypingGame textData={textData} userEmail={user.email}/>
               : "" 
             }
         </div>
-        {textData != null
-          ? <Scores textId={textData.id}/>
+        {textData != null && user != null
+          ? <Scores textId={textData.id} userEmail={user.email}/>
           : ""
         }
       </>
