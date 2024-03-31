@@ -12,6 +12,7 @@ type Props = {
 
 export default function TypingGame(props: Props) {
 	const [textData, setTextData] = useState<TextData>(props.textData)
+	const [textContent, setTextContent] = useState(props.textData.content)
 	const [user, setUser] = useState(props.userEmail)
 	const [userInput, setUserInput] = useState("")
   	const [correctChars, setCorrectChars] = useState(0)
@@ -24,15 +25,20 @@ export default function TypingGame(props: Props) {
   	const [intervalId, setIntervalId] = useState()
   	const [wpm, setWpm] = useState(0)
   	const [accuracy, setAccuracy] = useState(0)
+  	const [writtenText, setWrittenText] = useState("")
 
   	useEffect(() => {
   		setTextData(props.textData)
+  		setTextContent(props.textData.content)
+  		setWrittenText("")
   		setCorrectChars(0)
   		setErrorCount(0)
   		setWordCount(0)
   		setWordCorrectCharIndex(0)
   		setSeconds(0)
   		setGameFinished(false)
+  		setUserInput("")
+  		clearInterval(intervalId)
   	}, [props])
 
 	function checkText(userInput: string) {
@@ -56,12 +62,16 @@ export default function TypingGame(props: Props) {
       		setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
       		setGameStarted(false)
       		setWordCount(wordCount + 1)
+      		setWrittenText(textData.content.slice(0, correctChars + 1))
+      		setTextContent(content => textData.content.slice(correctChars + 1, textData.content.length))
       		clearInterval(intervalId)
       		return
     	}
 
     	if (userChar == answerChar) {
       		setCorrectChars(correctChars + 1)
+      		setWrittenText(textData.content.slice(0, correctChars + 1))
+      		setTextContent(content => textData.content.slice(correctChars + 1, textData.content.length))
       		if (userChar == " ") {
         		setWordCount(wordCount + 1)
         		setUserInput("")
@@ -93,7 +103,10 @@ export default function TypingGame(props: Props) {
 	return (
 		<>
 			<h3>{textData.title}</h3>
-			<h4>{textData.content}</h4>
+			<h4>
+				<span style={{color: 'green'}}>{writtenText}</span>
+				{textContent}
+			</h4>
         	<TextInput 
           		placeholder="Write in the text" 
           		onChange={e => {
@@ -101,7 +114,7 @@ export default function TypingGame(props: Props) {
             		checkText(e.target.value)
           	}} 
           	value={userInput} />
-          	{seconds} s
+          	{seconds} s <br />
         	{gameFinished 
         		? <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
             		<h3>Words typed: {wordCount}</h3>

@@ -24,6 +24,10 @@ export default function Scores(props: Props) {
 		)
 	);
 
+	if (loading) {
+		return <p>Loading scores...</p>
+	}
+
 	if (snapshot) {
 		const rows = snapshot.docs.map((doc) => (
     		<Table.Tr key={doc.id}>
