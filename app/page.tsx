@@ -11,7 +11,7 @@ import { collection } from 'firebase/firestore';
 import TextData from './TextData'
 import { useState } from 'react'
 import { useDisclosure } from '@mantine/hooks'
-import Scores from './Scores'
+import ScoreTable from './ScoreTable'
 import TypingGame from './TypingGame'
 
 export default function Home() {
@@ -25,6 +25,8 @@ export default function Home() {
     }
   );
   const [user, userLoad, userError] = useAuthState(auth)
+
+
 
   if (loading) {
     return (
@@ -65,15 +67,18 @@ export default function Home() {
               placeholder="Search after a text..."
               searchable
             />
-            {textData != null && user != null
-              ? <TypingGame textData={textData} userEmail={user.email}/>
+            {textData != null
+              ? <TypingGame textData={textData} userEmail={user ? user.email : undefined}/>
               : "" 
             }
         </div>
-        {textData != null && user != null
-          ? <Scores textId={textData.id} userEmail={user.email}/>
-          : ""
-        }
+        <div style={{float: 'right', width: '25%'}}>
+          <h1>Scores</h1>
+          {textData != null
+            ? <ScoreTable textId={textData.id} userEmail={user ? user.email : undefined}/>
+            : ""
+          }
+        </div>
       </>
   );
 }

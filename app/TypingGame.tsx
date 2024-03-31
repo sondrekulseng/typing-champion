@@ -28,6 +28,10 @@ export default function TypingGame(props: Props) {
   	const [writtenText, setWrittenText] = useState("")
 
   	useEffect(() => {
+  		resetGame()
+  	}, [props])
+
+  	function resetGame() {
   		setTextData(props.textData)
   		setTextContent(props.textData.content)
   		setWrittenText("")
@@ -39,7 +43,7 @@ export default function TypingGame(props: Props) {
   		setGameFinished(false)
   		setUserInput("")
   		clearInterval(intervalId)
-  	}, [props])
+  	}
 
 	function checkText(userInput: string) {
 		if (!gameStarted) {
@@ -91,6 +95,7 @@ export default function TypingGame(props: Props) {
   			wpm: wpm,
   			accuracy: accuracy
   		})
+  		resetGame()
   	}
 
   	function startTimer() {
@@ -122,7 +127,10 @@ export default function TypingGame(props: Props) {
             		<h3>Elapsed time: {seconds}s</h3>	
             		<h3>WPM: {wpm}</h3>
             		<h3>Accuracy: {accuracy} %</h3>
-            		<Button onClick={submitScore}>Submit score</Button>
+            		{user 
+            			? <Button onClick={submitScore}>Submit score</Button>
+            			: ""
+            		}
           		  </Alert>
           		: ""
           	}

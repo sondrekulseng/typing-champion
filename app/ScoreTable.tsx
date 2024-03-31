@@ -5,14 +5,15 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db } from "/firebase.config"
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import React from 'react'
-import { Skeleton, Table, TableColumn } from '@mantine/core'
+import { Skeleton, Table, TableColumn, Alert } from '@mantine/core'
 import { useState } from 'react'
+import Link from 'next/link'
 
 type Props = {
 	textId: string,
 	userEmail: string | undefined
 }
-export default function Scores(props: Props) {
+export default function ScoreTable(props: Props) {
 
 	const [scores, setScores] = useState([]);
 	const [snapshot, loading, error] = useCollection(
@@ -23,6 +24,11 @@ export default function Scores(props: Props) {
 			limit(10)
 		)
 	);
+
+	if (props.userEmail == undefined) {
+		return <Alert variant="light" color="blue" title="Not logged in">
+			<Link href="/login">Login</Link> or <Link href="/signup">sign up</Link> to view and submit scores</Alert>
+	}
 
 	if (loading) {
 		return <p>Loading scores...</p>
@@ -37,8 +43,6 @@ export default function Scores(props: Props) {
     		</Table.Tr>
   		));
 		return (
-			<div style={{float: 'right', width: '25%'}}>
-			<h1>Scores</h1>
 			<Table>
       			<Table.Thead>
         			<Table.Tr>
@@ -49,7 +53,6 @@ export default function Scores(props: Props) {
       			</Table.Thead>
       			<Table.Tbody>{rows}</Table.Tbody>
     		</Table>
-		</div>
 		)
 	}
 
