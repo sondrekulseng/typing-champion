@@ -67,14 +67,16 @@ export default function Home() {
             />
             {textData != null
               ? <TypingGame textData={textData} user={user}/>
-              : "" 
+              : ""
             }
         </div>
         <div style={{float: 'right', width: '25%'}}>
           <h1>Scores</h1>
           {textData != null
             ? <ScoreTable textId={textData.id} user={user} />
-            : ""
+            : <Alert variant="light" color="blue" title="No text selected">
+                  Select a text to view scores
+                </Alert>
           }
         </div>
       </>
