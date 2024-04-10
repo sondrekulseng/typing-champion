@@ -2,9 +2,10 @@ import TextData from './TextData'
 import { useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core';
 import { useEffect } from 'react'
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc, query, where, updateDoc } from "firebase/firestore";
 import { auth, db } from "/firebase.config"
 import firebase from "firebase/app"
+import { useCollection } from 'react-firebase-hooks/firestore';
 
 type Props = {
 	textData: TextData,
@@ -16,21 +17,29 @@ export default function TypingGame(props: Props) {
 	const [textContent, setTextContent] = useState(props.textData.content)
 	const [user, setUser] = useState(props.userEmail)
 	const [userInput, setUserInput] = useState("")
-  	const [correctChars, setCorrectChars] = useState(0)
+  const [correctChars, setCorrectChars] = useState(0)
 	const [errorCount, setErrorCount] = useState(0)
-  	const [wordCount, setWordCount] = useState(0)
-  	const [wordCorrectCharIndex, setWordCorrectCharIndex] = useState(0)
-  	const [seconds, setSeconds] = useState(0)
-  	const [gameStarted, setGameStarted] = useState(false)
-  	const [gameFinished, setGameFinished] = useState(false)
-  	const [intervalId, setIntervalId] = useState()
-  	const [wpm, setWpm] = useState(0)
-  	const [accuracy, setAccuracy] = useState(0)
-  	const [writtenText, setWrittenText] = useState("")
+  const [wordCount, setWordCount] = useState(0)
+  const [wordCorrectCharIndex, setWordCorrectCharIndex] = useState(0)
+  const [seconds, setSeconds] = useState(0)
+  const [gameStarted, setGameStarted] = useState(false)
+  const [gameFinished, setGameFinished] = useState(false)
+  const [intervalId, setIntervalId] = useState()
+  const [wpm, setWpm] = useState(0)
+  const [accuracy, setAccuracy] = useState(0)
+  const [writtenText, setWrittenText] = useState("")
 
   	useEffect(() => {
   		resetGame()
   	}, [props])
+
+		const [snapshot, loading, error] = useCollection(
+			query(
+				collection(db, 'scores'),
+				where("textId", "==", textData.id),
+				where("userEmail", "==", props.user.email)
+			)
+		);
 
   	function resetGame() {
   		setTextData(props.textData)
@@ -60,7 +69,7 @@ export default function TypingGame(props: Props) {
     	}
 
 	    if (correctChars == textData.content.length - 1) {
-    	  	setUserInput("")  
+    	  	setUserInput("")
       		console.log("Game finished")
       		setGameFinished(true)
       		setWpm(Math.round(wordCount / seconds * 60))
@@ -90,12 +99,19 @@ export default function TypingGame(props: Props) {
   	}
 
   	function submitScore() {
-  		addDoc(collection(db, "scores"), {
-  			textId: textData.id,
-  			userEmail: props.user.email,
-  			wpm: wpm,
-  			accuracy: accuracy
-  		})
+			if (snapshot.docs.length == 0) {
+				addDoc(collection(db, "scores"), {
+	  			textId: textData.id,
+	  			userEmail: props.user.email,
+	  			wpm: wpm,
+	  			accuracy: accuracy
+	  		})
+			} else {
+				const storedWpm = snapshot.docs[0].data().wpm;
+				if (wpm > storedWpm) {
+					updateDoc(snapshot.docs[0].ref, {wpm: wpm })
+				}
+			}
   		resetGame()
   	}
 
@@ -113,23 +129,23 @@ export default function TypingGame(props: Props) {
 				<span style={{color: 'green'}}>{writtenText}</span>
 				{textContent}
 			</h4>
-        	<TextInput 
-          		placeholder="Write in the text" 
+        	<TextInput
+          		placeholder="Write in the text"
           		onChange={e => {
             		setUserInput(e.target.value)
             		checkText(e.target.value)
-          	}} 
+          	}}
           	value={userInput} />
           	{seconds} s <br />
-        	{gameFinished 
+        	{gameFinished
         		? <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
             		<h3>Words typed: {wordCount}</h3>
             		<h3>Errors: {errorCount}</h3>
-            		<h3>Elapsed time: {seconds}s</h3>	
+            		<h3>Elapsed time: {seconds}s</h3>
             		<h3>WPM: {wpm}</h3>
             		<h3>Accuracy: {accuracy} %</h3>
-            		{props.user != undefined 
-            			? <Button onClick={submitScore}>Submit score</Button>
+            		{props.user != undefined
+            			? <Button onClick={submitScore}>Submit new record!</Button>
             			: ""
             		}
           		  </Alert>
