@@ -31,13 +31,13 @@ export default function TypingGame(props: Props) {
 
   	useEffect(() => {
   		resetGame()
-  	}, [props])
+  	}, [props.textData])
 
 		const [snapshot, loading, error] = useCollection(
 			query(
 				collection(db, 'scores'),
 				where("textId", "==", textData.id),
-				where("userEmail", "==", props.user.email)
+				where("userEmail", "==", props.user != null ? props.user.email : "")
 			)
 		);
 
@@ -145,7 +145,7 @@ export default function TypingGame(props: Props) {
             		<h3>WPM: {wpm}</h3>
             		<h3>Accuracy: {accuracy} %</h3>
             		{props.user != undefined
-            			? <Button onClick={submitScore}>Submit new record!</Button>
+            			? <Button onClick={submitScore}>Submit score</Button>
             			: ""
             		}
           		  </Alert>

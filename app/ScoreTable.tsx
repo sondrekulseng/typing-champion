@@ -19,7 +19,7 @@ export default function ScoreTable(props: Props) {
 	const [scores, setScores] = useState([]);
 	const [scoreQuery, setScoreQuery] = useState(
 		query(
-			collection(db, 'scores'), 
+			collection(db, 'scores'),
 			where("textId", "==", props.textId),
 			orderBy("wpm", "desc"),
 			limit(10)
@@ -31,7 +31,7 @@ export default function ScoreTable(props: Props) {
 		if (showPersonalScores) {
 			setScoreQuery(
 				query(
-					collection(db, 'scores'), 
+					collection(db, 'scores'),
 					where("textId", "==", props.textId),
 					where("userEmail", "==", props.user.email),
 					orderBy("wpm", "desc"),
@@ -41,7 +41,7 @@ export default function ScoreTable(props: Props) {
 		} else {
 			setScoreQuery(
 				query(
-					collection(db, 'scores'), 
+					collection(db, 'scores'),
 					where("textId", "==", props.textId),
 					orderBy("wpm", "desc"),
 					limit(10)
@@ -54,6 +54,10 @@ export default function ScoreTable(props: Props) {
 		return <p>Loading scores...</p>
 	}
 
+	if (error) {
+		return <p>An error occured while fetching scores. Try again</p>
+	}
+
 	if (snapshot) {
 		const rows = snapshot.docs.map((doc, index) => (
     		<Table.Tr key={doc.id}>
@@ -63,6 +67,7 @@ export default function ScoreTable(props: Props) {
       			<Table.Td>{doc.data().accuracy}%</Table.Td>
     		</Table.Tr>
   		));
+
 		return (
 			<>
 			<Table style={{marginBottom: '1em'}}>
@@ -78,20 +83,13 @@ export default function ScoreTable(props: Props) {
     		</Table>
     		{props.user == undefined
     			? <Alert variant="light" color="blue" title="Not logged in">
-                	<Link href="/login">Login</Link> or <Link href="/signup">sign up</Link> to view personal scores
-              	  </Alert>
-              	: <Checkbox label="Only show personal scores" checked={showPersonalScores} onChange={evt => setShowPersonalScores(evt.currentTarget.checked)} />
+                	Login to submit scores
+            </Alert>
+          : <Checkbox label="Show personal highscore" checked={showPersonalScores} onChange={evt => setShowPersonalScores(evt.currentTarget.checked)} />
           	}
           	</>
 		)
 	}
 
-	if (error) {
-		console.log(error.message)
-	}
 
-	return (
-		<div style={{float: 'right', width: '25%'}}>
-		</div>
-	)
 }

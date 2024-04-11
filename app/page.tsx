@@ -10,9 +10,11 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import { collection } from 'firebase/firestore';
 import TextData from './TextData'
 import { useState } from 'react'
-import { useDisclosure } from '@mantine/hooks'
 import ScoreTable from './ScoreTable'
 import TypingGame from './TypingGame'
+import LoginPage from './Login/LoginPage'
+import SignUpPage from './Login/SignUpPage'
+import SignOutButton from './Login/SignOutButton'
 
 export default function Home() {
   let texts = new Map<string, TextData>()
@@ -42,7 +44,7 @@ export default function Home() {
     snapshot.forEach(doc => {
       texts.set(doc.id, new TextData(
         doc.id,
-        doc.data().title, 
+        doc.data().title,
         doc.data().content)
       )
     })
@@ -59,7 +61,7 @@ export default function Home() {
           <h1>Typing champion</h1>
             <Select
               label="Choose a text"
-              data={options} 
+              data={options}
               onChange={(value, option) => getTextByKey(value)}
               placeholder="Search after a text..."
               selectFirstOptionOnChange={true}
@@ -77,6 +79,14 @@ export default function Home() {
             : <Alert variant="light" color="blue" title="No text selected">
                   Select a text to view scores
                 </Alert>
+          }
+          <br />
+          {user
+            ? <SignOutButton/>
+            : (<>
+                <LoginPage/> / <SignUpPage/>
+                </>
+              )
           }
         </div>
       </>
