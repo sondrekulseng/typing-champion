@@ -37,7 +37,7 @@ export default function TypingGame(props: Props) {
 			query(
 				collection(db, 'scores'),
 				where("textId", "==", textData.id),
-				where("userEmail", "==", props.user != null ? props.user.email : "")
+				where("userId", "==", props.user != null ? props.user.uid : "")
 			)
 		);
 
@@ -102,7 +102,8 @@ export default function TypingGame(props: Props) {
 			if (snapshot.docs.length == 0) {
 				addDoc(collection(db, "scores"), {
 	  			textId: textData.id,
-	  			userEmail: props.user.email,
+	  			userId: props.user.uid,
+					displayName: props.user.displayName,
 	  			wpm: wpm,
 	  			accuracy: accuracy
 	  		})
@@ -124,11 +125,10 @@ export default function TypingGame(props: Props) {
 
 	return (
 		<>
-			<h3>{textData.title}</h3>
-			<h4>
+			<h3>
 				<span style={{color: 'green'}}>{writtenText}</span>
 				{textContent}
-			</h4>
+			</h3>
         	<TextInput
           		placeholder="Write in the text"
           		onChange={e => {

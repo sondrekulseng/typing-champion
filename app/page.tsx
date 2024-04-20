@@ -81,6 +81,8 @@ export default function Home() {
                 </Alert>
           }
           <br />
+          {user ? "Hello " + user.displayName + "!" : ""}
+          <br />
           {user
             ? <SignOutButton/>
             : (<>

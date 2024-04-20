@@ -33,7 +33,7 @@ export default function ScoreTable(props: Props) {
 				query(
 					collection(db, 'scores'),
 					where("textId", "==", props.textId),
-					where("userEmail", "==", props.user.email),
+					where("userId", "==", props.user.uid),
 					orderBy("wpm", "desc"),
 					limit(10)
 				)
@@ -55,14 +55,14 @@ export default function ScoreTable(props: Props) {
 	}
 
 	if (error) {
-		return <p>An error occured while fetching scores. Try again</p>
+		return <Alert variant="light" color="red" title="Error loading scores">An error occured while fetching scores. Try again later</Alert>
 	}
 
 	if (snapshot) {
 		const rows = snapshot.docs.map((doc, index) => (
     		<Table.Tr key={doc.id}>
     			<Table.Td>{index + 1}</Table.Td>
-      			<Table.Td>{doc.data().userEmail}</Table.Td>
+      			<Table.Td>{doc.data().displayName}</Table.Td>
       			<Table.Td>{doc.data().wpm}</Table.Td>
       			<Table.Td>{doc.data().accuracy}%</Table.Td>
     		</Table.Tr>
