@@ -18,7 +18,7 @@ export default function SignUpForm() {
 		user,
 		loading,
 		error,
-	] = useCreateUserWithEmailAndPassword(auth);
+		] = useCreateUserWithEmailAndPassword(auth);
 
 	if (errorUpdate) {
 		console.log(errorUpdate)
@@ -32,28 +32,28 @@ export default function SignUpForm() {
 		evt.preventDefault();
 		const user = await createUserWithEmailAndPassword(email, password);
 		if (user) {
-			const update = await updateProfile({ displayName: username })
+			await updateProfile({ displayName: username })
 		}
 	}
 
 	return (
 		<>
-			<Modal opened={opened} onClose={close} title="New user" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
-				<form onSubmit={handleSignUp}>
-					<TextInput placeholder="MyAwesomeUsername" label="Username (will be public)" onChange={e => setUsername(e.target.value)} required />
-					<TextInput placeholder="example@mail" label="Email" onChange={e => setEmail(e.target.value)} required />
-					<PasswordInput placeholder="*******" label="Password" onChange={e => setPassword(e.target.value)} required />
-					<br />
-					{error
-						? <Alert variant="light" color="red" title="Signup error" style={{ marginBottom: '1em' }}>
-							<strong>{ErrorUtils.parseError(error.message)}</strong>
-						</Alert>
-						: ""
-					}
-					<Button type='submit' loading={loading}>Sign up</Button>
-				</form>
-			</Modal>
-			<Button onClick={open}>Sign up</Button>
+		<Modal opened={opened} onClose={close} title="New user" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+		<form onSubmit={handleSignUp}>
+		<TextInput placeholder="MyAwesomeUsername" label="Username (will be public)" onChange={e => setUsername(e.target.value)} required />
+		<TextInput placeholder="example@mail" label="Email" onChange={e => setEmail(e.target.value)} required />
+		<PasswordInput placeholder="*******" label="Password" onChange={e => setPassword(e.target.value)} required />
+		<br />
+		{error
+			? <Alert variant="light" color="red" title="Signup error" style={{ marginBottom: '1em' }}>
+				<strong>{ErrorUtils.parseError(error.message)}</strong>
+			  </Alert>
+			: ""
+		}
+		<Button type='submit' loading={loading}>Sign up</Button>
+		</form>
+		</Modal>
+		<Button onClick={open}>Sign up</Button>
 		</>
 	)
 }

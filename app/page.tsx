@@ -58,7 +58,7 @@ export default function Home() {
         selectFirstOptionOnChange={true}
         searchable
       />
-      <br /><p><i>Website created by <a href="https://sondre.kulseng.no/" target="_blank">Sondre Kulseng</a></i></p>
+      <br /><p><i>Website created by <a href="https://sondre.kulseng.no" target="_blank">Sondre Kulseng</a></i></p>
     </>
   );
 }

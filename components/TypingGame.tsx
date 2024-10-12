@@ -29,10 +29,6 @@ export default function TypingGame(props: Props) {
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
 
-	useEffect(() => {
-		resetGame()
-	}, [props.textData])
-
 	const [snapshot, loading, error] = useCollection(
 		query(
 			collection(db, 'scores'),
@@ -134,30 +130,32 @@ export default function TypingGame(props: Props) {
 		<>
 		<h3>
 		<span style={{color: 'green'}}>{writtenText}</span>
-		{textContent}
+			{textContent}
 		</h3>
 		<TextInput
-		placeholder="Write in the text"
-		onChange={e => {
-			setUserInput(e.target.value)
-			checkText(e.target.value)
-		}}
-		value={userInput} />
+			placeholder="Write in the text"
+			onChange={e => {
+				setUserInput(e.target.value)
+				checkText(e.target.value)
+			}}
+			value={userInput}
+			disabled={gameFinished} 
+		/>
 		{seconds} s <br />
 		{gameFinished
-		? <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
-		<h3>Words typed: {wordCount}</h3>
-		<h3>Errors: {errorCount}</h3>
-		<h3>Elapsed time: {seconds}s</h3>
-		<h3>WPM: {wpm}</h3>
-		<h3>Accuracy: {accuracy} %</h3>
-		{props.user != undefined
-		? <Button onClick={submitScore}>Submit score</Button>
-		: ""
-	}
-	</Alert>
-	: ""
-}
-</>
-)
+			? <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
+		  		<h3>Words typed: {wordCount}</h3>
+				<h3>Errors: {errorCount}</h3>
+				<h3>Elapsed time: {seconds}s</h3>
+				<h3>WPM: {wpm}</h3>
+				<h3>Accuracy: {accuracy} %</h3>
+				{props.user != undefined
+					? <Button onClick={submitScore}>Submit score</Button>
+					: <Button onClick={resetGame}>Reset game</Button>
+				}
+			  </Alert>
+			: ""
+		}
+		</>
+	)
 }
