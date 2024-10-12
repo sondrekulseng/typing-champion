@@ -1,11 +1,11 @@
-import TextData from './TextData'
+import TextData from '/models/TextData'
 import { useState } from 'react'
-import { TextInput, Alert, Button } from '@mantine/core';
+import { TextInput, Alert, Button } from '@mantine/core'
 import { useEffect } from 'react'
-import { collection, addDoc, query, where, updateDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
 import { auth, db } from "/firebase.config"
 import firebase from "firebase/app"
-import { useCollection } from 'react-firebase-hooks/firestore';
+import { useCollection } from 'react-firebase-hooks/firestore'
 
 type Props = {
 	textData: TextData,
