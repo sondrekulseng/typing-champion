@@ -1,20 +1,21 @@
-import TextData from '../models/TextData'
+import TextData from './TextData'
 import { useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core';
 import { useEffect } from 'react'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore";
-import { auth, db } from "../firebase.config"
-import Firebase from "firebase/app"
+import { auth, db } from "/firebase.config"
+import firebase from "firebase/app"
 import { useCollection } from 'react-firebase-hooks/firestore';
 
 type Props = {
 	textData: TextData,
-	user: any
+	user: Firebase.User | undefined
 }
 
 export default function TypingGame(props: Props) {
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
+	const [user, setUser] = useState(props.userEmail)
 	const [userInput, setUserInput] = useState("")
 	const [correctChars, setCorrectChars] = useState(0)
 	const [errorCount, setErrorCount] = useState(0)
@@ -28,13 +29,17 @@ export default function TypingGame(props: Props) {
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
 
+	useEffect(() => {
+		resetGame()
+	}, [props.textData])
+
 	const [snapshot, loading, error] = useCollection(
 		query(
 			collection(db, 'scores'),
 			where("textId", "==", textData.id),
 			where("userId", "==", props.user != null ? props.user.uid : "")
-		)
-	);
+			)
+		);
 
 	function resetGame() {
 		setTextData(props.textData)
@@ -46,7 +51,6 @@ export default function TypingGame(props: Props) {
 		setWordCorrectCharIndex(0)
 		setSeconds(0)
 		setGameFinished(false)
-		setGameStarted(false)
 		setUserInput("")
 		clearInterval(intervalId)
 	}
@@ -57,8 +61,15 @@ export default function TypingGame(props: Props) {
 			setGameStarted(true)
 		}
 
-		const userChar = userInput.charAt(userInput.length - 1)
-		const answerChar = textData.content.charAt(correctChars)
+		const userChar: char = userInput.charAt(userInput.length - 1)
+		const answerChar: char = textData.content.charAt(correctChars)
+
+		if (userInput.length < wordCorrectCharIndex) {
+			setCorrectChars(correctChars - 1)
+			setWordCorrectCharIndex(wordCorrectCharIndex - 1)
+			setWrittenText(textData.content.slice(0, correctChars - 1))
+			setTextContent(content => textData.content.slice(correctChars - 1, textData.content.length))
+		}
 
 		if (wordCorrectCharIndex != userInput.length - 1) {
 			return
@@ -95,10 +106,6 @@ export default function TypingGame(props: Props) {
 	}
 
 	function submitScore() {
-		if (snapshot == null) {
-			resetGame()
-			return
-		}
 		if (snapshot.docs.length == 0) {
 			addDoc(collection(db, "scores"), {
 				textId: textData.id,
@@ -110,7 +117,7 @@ export default function TypingGame(props: Props) {
 		} else {
 			const storedWpm = snapshot.docs[0].data().wpm;
 			if (wpm > storedWpm) {
-				updateDoc(snapshot.docs[0].ref, { wpm: wpm })
+				updateDoc(snapshot.docs[0].ref, {wpm: wpm })
 			}
 		}
 		resetGame()
@@ -118,42 +125,39 @@ export default function TypingGame(props: Props) {
 
 	function startTimer() {
 		const intervalId = setInterval(() => {
-			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1) * 100) / 100);
+			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1)*100)/100);
 		}, 100);
 		setIntervalId(intervalId)
 	}
 
 	return (
 		<>
-			<h3>
-				<span style={{ color: 'green' }}>{writtenText}</span>
-				{textContent}
-			</h3>
-			<TextInput
-				placeholder="Write in the text"
-				onChange={e => {
-					setUserInput(e.target.value)
-					checkText(e.target.value)
-				}}
-				disabled={gameFinished}
-				value={userInput} />
-			{seconds} s <br />
-			{gameFinished
-				? <Alert variant="light" color="blue" title="Game finished!" style={{ marginTop: '1em' }}>
-					<h3>Time: {seconds}s</h3>
-					<h3>WPM: {wpm}</h3>
-					<h3>Accuracy: {accuracy} % ({errorCount} errors)</h3>
-					{props.user != undefined
-						? <Button onClick={submitScore}>Submit score</Button>
-						: <Button onClick={resetGame}>Reset game</Button>
-					}
-				</Alert>
-				: ""
-			}
-			{gameStarted
-				? <Button onClick={resetGame} style={{marginTop: '2em'}}>Reset game</Button>
-				: ""
-			}
-		</>
-	)
+		<h3>
+		<span style={{color: 'green'}}>{writtenText}</span>
+		{textContent}
+		</h3>
+		<TextInput
+		placeholder="Write in the text"
+		onChange={e => {
+			setUserInput(e.target.value)
+			checkText(e.target.value)
+		}}
+		value={userInput} />
+		{seconds} s <br />
+		{gameFinished
+		? <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
+		<h3>Words typed: {wordCount}</h3>
+		<h3>Errors: {errorCount}</h3>
+		<h3>Elapsed time: {seconds}s</h3>
+		<h3>WPM: {wpm}</h3>
+		<h3>Accuracy: {accuracy} %</h3>
+		{props.user != undefined
+		? <Button onClick={submitScore}>Submit score</Button>
+		: ""
+	}
+	</Alert>
+	: ""
+}
+</>
+)
 }
