@@ -1,5 +1,5 @@
 import TextData from '/models/TextData'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core'
 import { useEffect } from 'react'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
@@ -12,15 +12,17 @@ type Props = {
 	user: Firebase.User | undefined
 }
 
+let correctChars = 0
+let errorCount = 0
+let currentWordErrorCount = 0
+let wordCount = 0
+let wordCorrectCharIndex = 0
+
 export default function TypingGame(props: Props) {
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
 	const [user, setUser] = useState(props.userEmail)
 	const [userInput, setUserInput] = useState("")
-	const [correctChars, setCorrectChars] = useState(0)
-	const [errorCount, setErrorCount] = useState(0)
-	const [wordCount, setWordCount] = useState(0)
-	const [wordCorrectCharIndex, setWordCorrectCharIndex] = useState(0)
 	const [seconds, setSeconds] = useState(0)
 	const [gameStarted, setGameStarted] = useState(false)
 	const [gameFinished, setGameFinished] = useState(false)
@@ -28,6 +30,8 @@ export default function TypingGame(props: Props) {
 	const [wpm, setWpm] = useState(0)
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
+	const [errorText, setErrorText] = useState("")
+	const [prevInputLength, setPrevInputLength] = useState(0)
 
 	const [snapshot, loading, error] = useCollection(
 		query(
@@ -41,10 +45,10 @@ export default function TypingGame(props: Props) {
 		setTextData(props.textData)
 		setTextContent(props.textData.content)
 		setWrittenText("")
-		setCorrectChars(0)
-		setErrorCount(0)
-		setWordCount(0)
-		setWordCorrectCharIndex(0)
+		correctChars = 0
+		errorCount = 0
+		wordCount = 0
+		wordCorrectCharIndex = 0
 		setSeconds(0)
 		setGameFinished(false)
 		setUserInput("")
@@ -60,18 +64,34 @@ export default function TypingGame(props: Props) {
 		const userChar: char = userInput.charAt(userInput.length - 1)
 		const answerChar: char = textData.content.charAt(correctChars)
 
-		if (userInput.length < wordCorrectCharIndex) {
-			setCorrectChars(correctChars - 1)
-			setWordCorrectCharIndex(wordCorrectCharIndex - 1)
-			setWrittenText(textData.content.slice(0, correctChars - 1))
-			setTextContent(content => textData.content.slice(correctChars - 1, textData.content.length))
-		}
-
-		if (wordCorrectCharIndex != userInput.length - 1) {
+		if (userChar != answerChar) {
+			// Wrong char is typed
+			errorCount++
+			currentWordErrorCount++
+			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
+			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
 			return
 		}
 
+		if (userChar == answerChar) {
+			// Correct char is typed
+			correctChars++
+			setWrittenText(textData.content.slice(0, correctChars))
+			setTextContent(content => textData.content.slice(correctChars, textData.content.length))
+			if (userChar == " ") {
+				wordCount++
+				setUserInput("")
+				wordCorrectCharIndex = 0
+				currentWordErrorCount = 0
+				setPrevInputLength(1)
+				setErrorText("")
+			} else {
+				wordCorrectCharIndex++
+			}
+		}
+
 		if (correctChars == textData.content.length - 1) {
+			// All chars has been typed
 			setUserInput("")
 			console.log("Game finished")
 			setGameFinished(true)
@@ -79,25 +99,32 @@ export default function TypingGame(props: Props) {
 			setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
 			setGameStarted(false)
 			setWordCount(wordCount + 1)
-			setWrittenText(textData.content.slice(0, correctChars + 1))
-			setTextContent(content => textData.content.slice(correctChars + 1, textData.content.length))
+			setWrittenText(textData.content.slice(0, correctChars))
+			setTextContent(content => textData.content.slice(correctChars, textData.content.length))
 			clearInterval(intervalId)
+			return
+		}
+	}
+
+	function handleCharDelete(userInput: string) {
+		const userChar: char = userInput.charAt(userInput.length - 1)
+		const answerChar: char = textData.content.charAt(correctChars)
+
+		if (userChar != answerChar) {
+			// Wrong char is typed
+			currentWordErrorCount--
+			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
 			return
 		}
 
 		if (userChar == answerChar) {
-			setCorrectChars(correctChars + 1)
-			setWrittenText(textData.content.slice(0, correctChars + 1))
-			setTextContent(content => textData.content.slice(correctChars + 1, textData.content.length))
-			if (userChar == " ") {
-				setWordCount(wordCount + 1)
-				setUserInput("")
-				setWordCorrectCharIndex(0)
-			} else {
-				setWordCorrectCharIndex(wordCorrectCharIndex + 1)
-			}
-		} else {
-			setErrorCount(errorCount + 1)
+			// Handle deletion of successful chars
+			correctChars--
+			wordCorrectCharIndex--
+			setWrittenText(textData.content.slice(0, correctChars))
+			setTextContent(textData.content.slice(correctChars, textData.content.length))
+			return
 		}
 	}
 
@@ -130,13 +157,22 @@ export default function TypingGame(props: Props) {
 		<>
 		<h3>
 		<span style={{color: 'green'}}>{writtenText}</span>
+		<span style={{color: 'red'}}>{errorText}</span>
 			{textContent}
 		</h3>
 		<TextInput
 			placeholder="Write in the text"
 			onChange={e => {
 				setUserInput(e.target.value)
-				checkText(e.target.value)
+				console.log(prevInputLength)
+				const currentInputLength = e.target.value.length;
+				if (currentInputLength < prevInputLength) {
+					console.log("Backspace trigger")
+					handleCharDelete(e.target.value)
+				} else {
+					checkText(e.target.value)
+				}
+				setPrevInputLength(currentInputLength)
 			}}
 			value={userInput}
 			disabled={gameFinished} 
