@@ -111,8 +111,6 @@ export default function TypingGame(props: Props) {
 	}
 
 	function handleCharDelete(userInput: string) {
-		setUserInput(userInput.slice(0, userInput.length - 1))
-
 		const userChar: char = userInput.charAt(userInput.length - 1)
 		const answerChar: char = textData.content.charAt(correctChars - 1)
 
@@ -168,13 +166,12 @@ export default function TypingGame(props: Props) {
 		</h3>
 		<TextInput
 			placeholder="Write in the text"
-			onChange={e => {
-				checkText(e.target.value)
-			}}
+			onChange={e => checkText(e.target.value)}
 			onKeyDown={e => {
-				if (e.key == "Backspace" && e.target.value.length > 0) {
-					handleCharDelete(e.target.value)
-					setUserInput(e.target.value.slice(0, e.target.value.length - 1))
+				const inputValue = e.target.value
+				if (e.key == "Backspace" && inputValue.length > 0) {
+					handleCharDelete(inputValue)
+					setUserInput(inputValue.slice(0, e.target.value.length - 1))
 					e.preventDefault();
 				}
 				if (e.key === "ArrowLeft") {
