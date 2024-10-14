@@ -44,10 +44,11 @@ export default function TypingGame(props: Props) {
 		setTextData(props.textData)
 		setTextContent(props.textData.content)
 		setWrittenText("")
-		correctChars = 0
-		errorCount = 0
 		wordCount = 0
+		correctChars = 0
 		wordCorrectCharIndex = 0
+		errorCount = 0
+		currentWordErrorCount = 0
 		setSeconds(0)
 		setGameFinished(false)
 		setUserInput("")
