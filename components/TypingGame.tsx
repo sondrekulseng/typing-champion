@@ -12,11 +12,11 @@ type Props = {
 	user: Firebase.User | undefined
 }
 
+let wordCount = 0
 let correctChars = 0
+let wordCorrectCharIndex = 0
 let errorCount = 0
 let currentWordErrorCount = 0
-let wordCount = 0
-let wordCorrectCharIndex = 0
 let maxTypeLength = 100
 
 export default function TypingGame(props: Props) {
@@ -64,7 +64,6 @@ export default function TypingGame(props: Props) {
 
 		if (userInput.length - 1  > maxTypeLength) {
 			// Block error typing over current word
-			console.log("blocked")
 			return
 		}
 
@@ -78,10 +77,8 @@ export default function TypingGame(props: Props) {
 			currentWordErrorCount++
 			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
 			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
-			console.log("NEXT CHAR: " + textData.content.charAt(correctChars + currentWordErrorCount))
 			if (textData.content.charAt(correctChars + currentWordErrorCount) == " ") {
 				// Max error for current word
-				console.log("block start")
 				maxTypeLength = wordCorrectCharIndex + currentWordErrorCount - 1
 				return
 			}
