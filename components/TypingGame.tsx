@@ -17,6 +17,7 @@ let errorCount = 0
 let currentWordErrorCount = 0
 let wordCount = 0
 let wordCorrectCharIndex = 0
+let maxTypeLength = 100
 
 export default function TypingGame(props: Props) {
 	const [textData, setTextData] = useState<TextData>(props.textData)
@@ -61,65 +62,80 @@ export default function TypingGame(props: Props) {
 			setGameStarted(true)
 		}
 
+		if (userInput.length - 1  > maxTypeLength) {
+			// Block error typing over current word
+			console.log("blocked")
+			return
+		}
+
+		setUserInput(userInput)
 		const userChar: char = userInput.charAt(userInput.length - 1)
 		const answerChar: char = textData.content.charAt(correctChars)
 
-		if (userChar != answerChar) {
+		if (userChar != answerChar || currentWordErrorCount > 0) {
 			// Wrong char is typed
 			errorCount++
 			currentWordErrorCount++
 			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
 			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			console.log("NEXT CHAR: " + textData.content.charAt(correctChars + currentWordErrorCount))
+			if (textData.content.charAt(correctChars + currentWordErrorCount) == " ") {
+				// Max error for current word
+				console.log("block start")
+				maxTypeLength = wordCorrectCharIndex + currentWordErrorCount - 1
+				return
+			}
 			return
 		}
 
 		if (userChar == answerChar) {
 			// Correct char is typed
 			correctChars++
+			maxTypeLength = 100
 			setWrittenText(textData.content.slice(0, correctChars))
-			setTextContent(content => textData.content.slice(correctChars, textData.content.length))
+			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			if (userChar == " ") {
 				wordCount++
 				setUserInput("")
 				wordCorrectCharIndex = 0
 				currentWordErrorCount = 0
-				setPrevInputLength(1)
 				setErrorText("")
 			} else {
 				wordCorrectCharIndex++
 			}
 		}
 
-		if (correctChars == textData.content.length - 1) {
+		if (correctChars == textData.content.length) {
 			// All chars has been typed
+			wordCount++;
 			setUserInput("")
-			console.log("Game finished")
 			setGameFinished(true)
+			setGameStarted(false)
 			setWpm(Math.round(wordCount / seconds * 60))
 			setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
-			setGameStarted(false)
-			setWordCount(wordCount + 1)
 			setWrittenText(textData.content.slice(0, correctChars))
-			setTextContent(content => textData.content.slice(correctChars, textData.content.length))
+			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			clearInterval(intervalId)
 			return
 		}
 	}
 
 	function handleCharDelete(userInput: string) {
-		const userChar: char = userInput.charAt(userInput.length - 1)
-		const answerChar: char = textData.content.charAt(correctChars)
+		setUserInput(userInput.slice(0, userInput.length - 1))
 
-		if (userChar != answerChar) {
-			// Wrong char is typed
+		const userChar: char = userInput.charAt(userInput.length - 1)
+		const answerChar: char = textData.content.charAt(correctChars - 1)
+
+		if (userChar != answerChar || currentWordErrorCount > 0) {
+			// Delete error char
 			currentWordErrorCount--
-			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
-			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
+			setErrorText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
 			return
 		}
 
 		if (userChar == answerChar) {
-			// Handle deletion of successful chars
+			// Delete correct char
 			correctChars--
 			wordCorrectCharIndex--
 			setWrittenText(textData.content.slice(0, correctChars))
@@ -163,16 +179,14 @@ export default function TypingGame(props: Props) {
 		<TextInput
 			placeholder="Write in the text"
 			onChange={e => {
-				setUserInput(e.target.value)
-				console.log(prevInputLength)
-				const currentInputLength = e.target.value.length;
-				if (currentInputLength < prevInputLength) {
-					console.log("Backspace trigger")
+				checkText(e.target.value)
+			}}
+			onKeyDown={e => {
+				if (e.key == "Backspace" && e.target.value.length > 0) {
 					handleCharDelete(e.target.value)
-				} else {
-					checkText(e.target.value)
+					setUserInput(e.target.value.slice(0, e.target.value.length - 1))
+					e.preventDefault();
 				}
-				setPrevInputLength(currentInputLength)
 			}}
 			value={userInput}
 			disabled={gameFinished} 
