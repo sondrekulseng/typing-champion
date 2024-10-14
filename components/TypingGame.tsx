@@ -178,7 +178,7 @@ export default function TypingGame(props: Props) {
 					e.preventDefault();
 				}
 				if (e.key === "ArrowLeft") {
-    				e.preventDefault();
+					e.preventDefault();
   				}
 			}}
 
