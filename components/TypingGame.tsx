@@ -62,8 +62,8 @@ export default function TypingGame(props: Props) {
 			setGameStarted(true)
 		}
 
-		if (userInput.length - 1  > maxTypeLength) {
-			// Block error typing over current word
+		if (currentWordErrorCount > 4 || correctChars + currentWordErrorCount === textData.content.length) {
+			// Block user from typing more errors
 			return
 		}
 
@@ -77,11 +77,6 @@ export default function TypingGame(props: Props) {
 			currentWordErrorCount++
 			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
 			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
-			if (textData.content.charAt(correctChars + currentWordErrorCount) == " ") {
-				// Max error for current word
-				maxTypeLength = wordCorrectCharIndex + currentWordErrorCount - 1
-				return
-			}
 			return
 		}
 
@@ -188,6 +183,7 @@ export default function TypingGame(props: Props) {
     				e.preventDefault();
   				}
 			}}
+
 			value={userInput}
 			disabled={gameFinished} 
 		/>
