@@ -169,8 +169,8 @@ export default function TypingGame(props: Props) {
 	return (
 		<>
 		<h3>
-		<span style={{color: 'green'}}>{writtenText}</span>
-		<span style={{color: 'red'}}>{errorText}</span>
+		<span style={{backgroundColor: 'rgba(51, 170, 51, .6)'}}>{writtenText}</span>
+		<span style={{backgroundColor: 'rgba(247, 2, 2, .6)'}}>{errorText}</span>
 			{textContent}
 		</h3>
 		<TextInput
@@ -184,6 +184,9 @@ export default function TypingGame(props: Props) {
 					setUserInput(e.target.value.slice(0, e.target.value.length - 1))
 					e.preventDefault();
 				}
+				if (e.key === "ArrowLeft") {
+    				e.preventDefault();
+  				}
 			}}
 			value={userInput}
 			disabled={gameFinished} 
