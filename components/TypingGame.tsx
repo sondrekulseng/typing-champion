@@ -1,5 +1,5 @@
 import TextData from '/models/TextData'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core'
 import { useEffect } from 'react'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
@@ -17,7 +17,6 @@ let correctChars = 0
 let wordCorrectCharIndex = 0
 let errorCount = 0
 let currentWordErrorCount = 0
-let maxTypeLength = 100
 
 export default function TypingGame(props: Props) {
 	const [textData, setTextData] = useState<TextData>(props.textData)
@@ -32,7 +31,6 @@ export default function TypingGame(props: Props) {
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
 	const [errorText, setErrorText] = useState("")
-	const [prevInputLength, setPrevInputLength] = useState(0)
 
 	const [snapshot, loading, error] = useCollection(
 		query(
@@ -83,7 +81,6 @@ export default function TypingGame(props: Props) {
 		if (userChar == answerChar) {
 			// Correct char is typed
 			correctChars++
-			maxTypeLength = 100
 			setWrittenText(textData.content.slice(0, correctChars))
 			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			if (userChar == " ") {
@@ -164,8 +161,8 @@ export default function TypingGame(props: Props) {
 	return (
 		<>
 		<h3>
-		<span style={{backgroundColor: 'rgba(51, 170, 51, .6)'}}>{writtenText}</span>
-		<span style={{backgroundColor: 'rgba(247, 2, 2, .6)'}}>{errorText}</span>
+			<span style={{backgroundColor: 'rgba(51, 170, 51, .6)'}}>{writtenText}</span>
+			<span style={{backgroundColor: 'rgba(247, 2, 2, .6)'}}>{errorText}</span>
 			{textContent}
 		</h3>
 		<TextInput
