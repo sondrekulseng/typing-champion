@@ -12,15 +12,17 @@ type Props = {
 	user: Firebase.User | undefined
 }
 
+let wordCount = 0
+let correctChars = 0
+let wordCorrectCharIndex = 0
+let errorCount = 0
+let currentWordErrorCount = 0
+
 export default function TypingGame(props: Props) {
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
 	const [user, setUser] = useState(props.userEmail)
 	const [userInput, setUserInput] = useState("")
-	const [correctChars, setCorrectChars] = useState(0)
-	const [errorCount, setErrorCount] = useState(0)
-	const [wordCount, setWordCount] = useState(0)
-	const [wordCorrectCharIndex, setWordCorrectCharIndex] = useState(0)
 	const [seconds, setSeconds] = useState(0)
 	const [gameStarted, setGameStarted] = useState(false)
 	const [gameFinished, setGameFinished] = useState(false)
@@ -28,6 +30,7 @@ export default function TypingGame(props: Props) {
 	const [wpm, setWpm] = useState(0)
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
+	const [errorText, setErrorText] = useState("")
 
 	const [snapshot, loading, error] = useCollection(
 		query(
@@ -41,10 +44,11 @@ export default function TypingGame(props: Props) {
 		setTextData(props.textData)
 		setTextContent(props.textData.content)
 		setWrittenText("")
-		setCorrectChars(0)
-		setErrorCount(0)
-		setWordCount(0)
-		setWordCorrectCharIndex(0)
+		wordCount = 0
+		correctChars = 0
+		wordCorrectCharIndex = 0
+		errorCount = 0
+		currentWordErrorCount = 0
 		setSeconds(0)
 		setGameFinished(false)
 		setUserInput("")
@@ -57,47 +61,74 @@ export default function TypingGame(props: Props) {
 			setGameStarted(true)
 		}
 
-		const userChar: char = userInput.charAt(userInput.length - 1)
-		const answerChar: char = textData.content.charAt(correctChars)
-
-		if (userInput.length < wordCorrectCharIndex) {
-			setCorrectChars(correctChars - 1)
-			setWordCorrectCharIndex(wordCorrectCharIndex - 1)
-			setWrittenText(textData.content.slice(0, correctChars - 1))
-			setTextContent(content => textData.content.slice(correctChars - 1, textData.content.length))
-		}
-
-		if (wordCorrectCharIndex != userInput.length - 1) {
+		if (currentWordErrorCount > 4 || correctChars + currentWordErrorCount === textData.content.length) {
+			// Block user from typing more errors
 			return
 		}
 
-		if (correctChars == textData.content.length - 1) {
-			setUserInput("")
-			console.log("Game finished")
-			setGameFinished(true)
-			setWpm(Math.round(wordCount / seconds * 60))
-			setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
-			setGameStarted(false)
-			setWordCount(wordCount + 1)
-			setWrittenText(textData.content.slice(0, correctChars + 1))
-			setTextContent(content => textData.content.slice(correctChars + 1, textData.content.length))
-			clearInterval(intervalId)
+		setUserInput(userInput)
+		const userChar: char = userInput.charAt(userInput.length - 1)
+		const answerChar: char = textData.content.charAt(correctChars)
+
+		if (userChar != answerChar || currentWordErrorCount > 0) {
+			// Wrong char is typed
+			errorCount++
+			currentWordErrorCount++
+			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
+			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
 			return
 		}
 
 		if (userChar == answerChar) {
-			setCorrectChars(correctChars + 1)
-			setWrittenText(textData.content.slice(0, correctChars + 1))
-			setTextContent(content => textData.content.slice(correctChars + 1, textData.content.length))
+			// Correct char is typed
+			correctChars++
+			setWrittenText(textData.content.slice(0, correctChars))
+			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			if (userChar == " ") {
-				setWordCount(wordCount + 1)
+				wordCount++
 				setUserInput("")
-				setWordCorrectCharIndex(0)
+				wordCorrectCharIndex = 0
+				currentWordErrorCount = 0
+				setErrorText("")
 			} else {
-				setWordCorrectCharIndex(wordCorrectCharIndex + 1)
+				wordCorrectCharIndex++
 			}
-		} else {
-			setErrorCount(errorCount + 1)
+		}
+
+		if (correctChars == textData.content.length) {
+			// All chars has been typed
+			wordCount++;
+			setUserInput("")
+			setGameFinished(true)
+			setGameStarted(false)
+			setWpm(Math.round(wordCount / seconds * 60))
+			setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
+			setWrittenText(textData.content.slice(0, correctChars))
+			setTextContent(textData.content.slice(correctChars, textData.content.length))
+			clearInterval(intervalId)
+			return
+		}
+	}
+
+	function handleCharDelete(userInput: string) {
+		const userChar: char = userInput.charAt(userInput.length - 1)
+		const answerChar: char = textData.content.charAt(correctChars - 1)
+
+		if (userChar != answerChar || currentWordErrorCount > 0) {
+			// Delete error char
+			currentWordErrorCount--
+			setErrorText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
+			return
+		}
+
+		if (userChar == answerChar) {
+			// Delete correct char
+			correctChars--
+			wordCorrectCharIndex--
+			setWrittenText(textData.content.slice(0, correctChars))
+			setTextContent(textData.content.slice(correctChars, textData.content.length))
+			return
 		}
 	}
 
@@ -129,15 +160,25 @@ export default function TypingGame(props: Props) {
 	return (
 		<>
 		<h3>
-		<span style={{color: 'green'}}>{writtenText}</span>
+			<span style={{backgroundColor: 'rgba(51, 170, 51, .6)'}}>{writtenText}</span>
+			<span style={{backgroundColor: 'rgba(247, 2, 2, .6)'}}>{errorText}</span>
 			{textContent}
 		</h3>
 		<TextInput
 			placeholder="Write in the text"
-			onChange={e => {
-				setUserInput(e.target.value)
-				checkText(e.target.value)
+			onChange={e => checkText(e.target.value)}
+			onKeyDown={e => {
+				const inputValue = e.target.value
+				if (e.key == "Backspace" && inputValue.length > 0) {
+					handleCharDelete(inputValue)
+					setUserInput(inputValue.slice(0, e.target.value.length - 1))
+					e.preventDefault();
+				}
+				if (e.key === "ArrowLeft") {
+					e.preventDefault();
+  				}
 			}}
+
 			value={userInput}
 			disabled={gameFinished} 
 		/>
