@@ -12,7 +12,7 @@ export default class ErrorUtils {
 		if (errorMessage.includes("auth/missing-password")) {
 			return "Please enter a password.";
 		}
-		if(errorMessage.includes("auth/weak-password")) {
+		if (errorMessage.includes("auth/weak-password")) {
 			return "Password should be atleast 6 characters.";
 		}
 	}
