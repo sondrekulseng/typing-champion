@@ -46,14 +46,14 @@ export default function Page({ params }: Readonly<Props>) {
             <>
                 <div style={{ float: 'left', width: '70%' }}>
                     <h3>Ready to race! Type the text below:</h3>
-                    <Paper withBorder={true} style={{padding: '1em'}}>
+                    <Paper withBorder={true} style={{ padding: '1em' }}>
                         <TypingGame textData={textData} user={user} />
                     </Paper>
                 </div>
                 <div style={{ float: 'right', width: '25%' }}>
                     <h3>Leaderboard</h3>
                     <ScoreTable textId={textData.id} user={user} />
-                    {user
+                    {user && user.emailVerified
                         ? (<><p><strong>Hello {user.displayName}!</strong></p> <SignOutButton /></>)
                         : (<>
                             <br />

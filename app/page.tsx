@@ -25,7 +25,7 @@ export default function Home() {
 
   if (loading) {
     return <Loader color="blue" />
-    
+
   }
 
   if (error) {
