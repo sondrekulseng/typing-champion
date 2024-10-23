@@ -12,10 +12,11 @@ export default function SignUpForm() {
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [passwordError, setPasswordError] = useState(true);
+	const [passwordConfirm, setPasswordConfirm] = useState("");
+	const [showPasswordErrorAlert, setShowPasswordErrorAlert] = useState(false);
+	const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
 	const [opened, { open, close }] = useDisclosure(false);
 	const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
-	const [sendEmailVerification, sending, errorEmail] = useSendEmailVerification(auth);
 	const [openEmailVerifyModal, setOpenModalVerifyModal] = useState(false);
 
 	const [
@@ -42,16 +43,18 @@ export default function SignUpForm() {
 		}
 	}
 
-	function verifyPassword(input: string) {
-		if (password != input) {
-			setPasswordError(true)
+	function verifyPassword(passInput: string, passInputConfirm: string) {
+		if (passInput != passInputConfirm) {
+			setShowPasswordErrorAlert(true)
+			setSubmitButtonDisabled(true)
 		} else {
-			setPasswordError(false)
+			setShowPasswordErrorAlert(false)
+			setSubmitButtonDisabled(false)
 		}
 	}
 
 	function handleClose() {
-		setPasswordError(false)
+		setShowPasswordErrorAlert(false)
 		close()
 	}
 
@@ -61,11 +64,21 @@ export default function SignUpForm() {
 				<form onSubmit={handleSignUp}>
 					<TextInput placeholder="MyAwesomeUsername" label="Username (will be public)" onChange={e => setUsername(e.target.value)} required />
 					<TextInput placeholder="example@mail" label="Email" onChange={e => setEmail(e.target.value)} required />
-					<PasswordInput placeholder="*******" label="Password" onChange={e => setPassword(e.target.value)} required />
-					<PasswordInput placeholder="*******" label="Confirm password" onChange={e => verifyPassword(e.target.value)} required />
+					<PasswordInput placeholder="*******" label="Password" onChange={e => {
+						setPassword((current => {
+							verifyPassword(e.target.value, passwordConfirm)
+							return e.target.value
+						}))
+					 }} required />
+					<PasswordInput placeholder="*******" label="Confirm password" onChange={e => {
+						setPasswordConfirm((current => {
+							verifyPassword(password, e.target.value)
+							return e.target.value
+						}))
+					 }} required />
 					<br />
-					{passwordError
-						? <Alert variant="light" color="yellow" title="Warning" style={{ marginBottom: '1em' }}>
+					{showPasswordErrorAlert
+						? <Alert variant="light" color="red" title="Error" style={{ marginBottom: '1em' }}>
 							<strong>Passwords do not match</strong>
 						</Alert>
 						: ""
@@ -76,7 +89,7 @@ export default function SignUpForm() {
 						</Alert>
 						: ""
 					}
-					<Button type='submit' loading={loading} disabled={passwordError}>Sign up</Button>
+					<Button type='submit' loading={loading} disabled={submitButtonDisabled}>Sign up</Button>
 				</form>
 			</Modal>
 			{openEmailVerifyModal ? <EmailVerification email={email} /> : ""}
