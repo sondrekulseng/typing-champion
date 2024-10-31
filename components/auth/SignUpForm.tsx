@@ -1,7 +1,7 @@
 "use client"
 
 import { PasswordInput, TextInput, Button, Alert, Modal } from '@mantine/core';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { auth } from "../../firebase.config";
 import { useCreateUserWithEmailAndPassword, useSendEmailVerification, useUpdateProfile } from 'react-firebase-hooks/auth';
 import ErrorUtils from '../../utils/errorUtils';
@@ -18,13 +18,18 @@ export default function SignUpForm() {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
 	const [openEmailVerifyModal, setOpenModalVerifyModal] = useState(false);
-
 	const [
 		createUserWithEmailAndPassword,
 		user,
 		loading,
 		error,
 	] = useCreateUserWithEmailAndPassword(auth);
+
+	useEffect(() => {
+		if (openEmailVerifyModal) {
+			close()
+		}
+	}, [openEmailVerifyModal])
 
 	if (errorUpdate) {
 		console.log(errorUpdate)
@@ -60,7 +65,7 @@ export default function SignUpForm() {
 
 	return (
 		<>
-			<Modal opened={opened && !user} onClose={handleClose} title="New user" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+			<Modal opened={opened} onClose={handleClose} title="New user" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
 				<form onSubmit={handleSignUp}>
 					<TextInput placeholder="MyAwesomeUsername" label="Username (will be public)" onChange={e => setUsername(e.target.value)} required />
 					<TextInput placeholder="example@mail.com" label="Email" onChange={e => setEmail(e.target.value)} required />

@@ -2,13 +2,12 @@ import { auth } from "@/firebase.config";
 import { Alert, Button, Modal, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import { useSendEmailVerification, useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useSendEmailVerification } from "react-firebase-hooks/auth";
 
 type Props = {
-    email: string,
-    password: string
+    email: string
 }
-export default function EmailVerification({ email, password }: Readonly<Props>) {
+export default function EmailVerification({ email }: Readonly<Props>) {
 
     const [opened, { close }] = useDisclosure(true);
     const [emailSent, setEmailSent] = useState(false);
@@ -40,9 +39,14 @@ export default function EmailVerification({ email, password }: Readonly<Props>) 
         }
     }
 
+    async function closeAndSignOut() {
+        await auth.signOut();
+        close()
+    }
+
     return (
         <>
-            <Modal opened={opened} onClose={close} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+            <Modal opened={opened} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
                 <h3>Please verify your email</h3>
                 <p>Click the button below to send a verification link to: {email}</p>
                 {error
