@@ -19,18 +19,12 @@ type Props = {
 
 export default function Page({ params }: Readonly<Props>) {
 
+    const [user, userLoad, userError] = useAuthState(auth)
+
     const [document, loading, error] = useDocument(
         doc(db, 'texts', params.textId)
     );
 
-    const [user, userLoad, userError] = useAuthState(auth)
-
-    useEffect(() => {
-        if (user != null) {
-            console.log("User updated")
-            user.reload().finally;
-        }
-    }, [user])
 
     if (loading) {
         return <h3>Loading game...</h3>

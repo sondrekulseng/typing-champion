@@ -97,7 +97,7 @@ export default function SignUpForm() {
 					<Button type='submit' loading={loading} disabled={submitButtonDisabled}>Sign up</Button>
 				</form>
 			</Modal>
-			{openEmailVerifyModal ? <EmailVerification email={email} password={password} /> : ""}
+			{openEmailVerifyModal ? <EmailVerification email={email} /> : ""}
 			<Button onClick={open}>Sign up</Button>
 		</>
 	)

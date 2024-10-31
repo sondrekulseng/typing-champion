@@ -27,7 +27,7 @@ export default function EmailVerification({ email }: Readonly<Props>) {
             alert("User is not logged!")
             return
         }
-
+        await auth.currentUser.reload();
         const emailVerified = auth.currentUser.emailVerified;
 
         if (emailVerified) {
