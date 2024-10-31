@@ -63,7 +63,7 @@ export default function SignUpForm() {
 			<Modal opened={opened && !user} onClose={handleClose} title="New user" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
 				<form onSubmit={handleSignUp}>
 					<TextInput placeholder="MyAwesomeUsername" label="Username (will be public)" onChange={e => setUsername(e.target.value)} required />
-					<TextInput placeholder="example@mail" label="Email" onChange={e => setEmail(e.target.value)} required />
+					<TextInput placeholder="example@mail.com" label="Email" onChange={e => setEmail(e.target.value)} required />
 					<PasswordInput placeholder="*******" label="Password" onChange={e => {
 						setPassword((current => {
 							verifyPassword(e.target.value, passwordConfirm)
@@ -92,7 +92,7 @@ export default function SignUpForm() {
 					<Button type='submit' loading={loading} disabled={submitButtonDisabled}>Sign up</Button>
 				</form>
 			</Modal>
-			{openEmailVerifyModal ? <EmailVerification email={email} /> : ""}
+			{openEmailVerifyModal ? <EmailVerification email={email} password={password} /> : ""}
 			<Button onClick={open}>Sign up</Button>
 		</>
 	)

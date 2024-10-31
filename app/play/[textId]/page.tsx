@@ -11,6 +11,7 @@ import SignOutButton from '@/components/auth/SignOutButton';
 import SignUpForm from '@/components/auth/SignUpForm';
 import LoginForm from '@/components/auth/LoginForm';
 import { Paper } from '@mantine/core';
+import { useEffect } from 'react';
 
 type Props = {
     params: { textId: string }
@@ -23,6 +24,13 @@ export default function Page({ params }: Readonly<Props>) {
     );
 
     const [user, userLoad, userError] = useAuthState(auth)
+
+    useEffect(() => {
+        if (user != null) {
+            console.log("User updated")
+            user.reload().finally;
+        }
+    }, [user])
 
     if (loading) {
         return <h3>Loading game...</h3>

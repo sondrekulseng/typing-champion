@@ -38,7 +38,7 @@ export default function LoginForm() {
 
 	return (
 		<>
-			<Modal opened={opened} onClose={close} title="Login" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+			<Modal opened={opened && !user} onClose={close} title="Login" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
 				<form onSubmit={handleLogin}>
 					<TextInput label="Email" placeholder="example@mail.com" onChange={e => setEmail(e.target.value)} required />
 					<PasswordInput label="Password" placeholder="*******" onChange={e => setPassword(e.target.value)} required />
