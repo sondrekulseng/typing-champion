@@ -72,16 +72,16 @@ export default function Page({ params }: Readonly<Props>) {
                     {user
                         ? (
                             <>
-                              <Alert variant="light" color="green" title="Logged in" style={{marginTop: '1em', marginBottom: '1em'}}>
-					            Email: {user.email}
-				            </Alert>
-                              <SignOutButton />
+                                <Alert variant="light" color="green" title="Logged in" style={{ marginTop: '1em', marginBottom: '1em' }}>
+                                    Email: {user.email}
+                                </Alert>
+                                <SignOutButton />
                             </>
                         )
                         : (
                             <>
-                              <br />
-                              <LoginForm /> / <SignUpForm />
+                                <br />
+                                <LoginForm /> / <SignUpForm />
                             </>
                         )
                     }
