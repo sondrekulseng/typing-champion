@@ -82,11 +82,12 @@ export default function ScoreTable(props: Props) {
 				? <Alert variant="light" color="blue" title="Not logged in">
 					Login to submit scores
 				  </Alert>
-				: <Checkbox 
-					label="Show personal highscore" 
-					checked={showPersonalScores} 
-					onChange={evt => setShowPersonalScores(evt.currentTarget.checked)} 
-				  />
+				: 
+					<Checkbox 
+						label="Show personal highscore" 
+						checked={showPersonalScores} 
+						onChange={evt => setShowPersonalScores(evt.currentTarget.checked)} 
+				  	/>
 			}
 			</>
 		)

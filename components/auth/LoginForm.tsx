@@ -1,18 +1,16 @@
 "use client"
 
 import { PasswordInput, TextInput, Button, Alert, Modal } from '@mantine/core';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { auth } from "../../firebase.config";
 import ErrorUtils from '../../utils/errorUtils';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { useDisclosure } from '@mantine/hooks'
-import EmailVerification from './EmailVerification';
 
 export default function LoginForm() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [opened, { open, close }] = useDisclosure(false);
-	const [openEmailVerifyModal, setOpenModalVerifyModal] = useState(false);
 	const [
 		signInWithEmailAndPassword,
 		user,
@@ -20,26 +18,9 @@ export default function LoginForm() {
 		error,
 	] = useSignInWithEmailAndPassword(auth);
 
-	useEffect(() => {
-		if (openEmailVerifyModal) {
-			close()
-		}
-	}, [openEmailVerifyModal])
-
 	async function handleLogin(evt: FormEvent<HTMLFormElement>) {
 		evt.preventDefault();
-
-		const userCredential = await signInWithEmailAndPassword(email, password);
-
-		if (userCredential == undefined) {
-			return
-		}
-
-		const user = userCredential.user;
-
-		if (!user.emailVerified) {
-			setOpenModalVerifyModal(true)
-		}
+		await signInWithEmailAndPassword(email, password);
 	}
 
 	return (
@@ -58,7 +39,6 @@ export default function LoginForm() {
 					<Button type='submit' loading={loading}>Login</Button>
 				</form>
 			</Modal>
-			{openEmailVerifyModal ? <EmailVerification email={email}/> : ""}
 			<Button onClick={open}>Login</Button>
 		</>
 	)

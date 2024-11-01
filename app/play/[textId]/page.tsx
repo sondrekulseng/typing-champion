@@ -10,8 +10,9 @@ import ScoreTable from '@/components/ScoreTable';
 import SignOutButton from '@/components/auth/SignOutButton';
 import SignUpForm from '@/components/auth/SignUpForm';
 import LoginForm from '@/components/auth/LoginForm';
-import { Paper } from '@mantine/core';
-import { useEffect } from 'react';
+import { Alert, Paper } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import EmailVerification from '@/components/auth/EmailVerification';
 
 type Props = {
     params: { textId: string }
@@ -20,6 +21,19 @@ type Props = {
 export default function Page({ params }: Readonly<Props>) {
 
     const [user, userLoad, userError] = useAuthState(auth)
+    const [openEmailVerifyModal, setOpenModalVerifyModal] = useState(false)
+
+    useEffect(() => {
+        if (user == undefined) {
+            setOpenModalVerifyModal(false)
+            return
+        }
+        if (!user.emailVerified) {
+            setOpenModalVerifyModal(true)
+            return
+        }
+        user.reload().finally
+    }, [user])
 
     const [document, loading, error] = useDocument(
         doc(db, 'texts', params.textId)
@@ -41,8 +55,8 @@ export default function Page({ params }: Readonly<Props>) {
 
         const textData = new TextData(
             document.id,
-            document.data().title,
-            document.data().content
+            document.data()?.title,
+            document.data()?.content
         );
         return (
             <>
@@ -55,14 +69,23 @@ export default function Page({ params }: Readonly<Props>) {
                 <div style={{ float: 'right', width: '25%' }}>
                     <h3>Leaderboard</h3>
                     <ScoreTable textId={textData.id} user={user} />
-                    {user && user.emailVerified
-                        ? (<><p><strong>Hello {user.displayName}!</strong></p> <SignOutButton /></>)
-                        : (<>
-                            <br />
-                            <LoginForm /> / <SignUpForm />
-                        </>
+                    {user
+                        ? (
+                            <>
+                              <Alert variant="light" color="green" title="Logged in" style={{marginTop: '1em', marginBottom: '1em'}}>
+					            Email: {user.email}
+				            </Alert>
+                              <SignOutButton />
+                            </>
+                        )
+                        : (
+                            <>
+                              <br />
+                              <LoginForm /> / <SignUpForm />
+                            </>
                         )
                     }
+                    {openEmailVerifyModal && user ? <EmailVerification email={user.email} /> : ""}
                 </div>
             </>
         )

@@ -1,5 +1,5 @@
 import { auth } from "@/firebase.config";
-import { Alert, Button, Modal, TextInput } from "@mantine/core";
+import { Alert, Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { useSendEmailVerification } from "react-firebase-hooks/auth";
@@ -11,6 +11,7 @@ export default function EmailVerification({ email }: Readonly<Props>) {
 
     const [opened, { close }] = useDisclosure(true);
     const [emailSent, setEmailSent] = useState(false);
+    const [verificationLoading, setVerifcationLoading] = useState(false);
     const [verificationError, setVerificationError] = useState(false);
     const [sendEmailVerification, sending, error] = useSendEmailVerification(auth);
 
@@ -22,21 +23,21 @@ export default function EmailVerification({ email }: Readonly<Props>) {
     }
 
     async function verify() {
-
         if (auth.currentUser == null) {
             alert("User is not logged!")
             return
         }
+        setVerifcationLoading(true)
         await auth.currentUser.reload();
         const emailVerified = auth.currentUser.emailVerified;
 
         if (emailVerified) {
             setVerificationError(false)
-            console.log("Email verified")
             close()
         } else {
             setVerificationError(true)
         }
+        setVerifcationLoading(false)
     }
 
     async function closeAndSignOut() {
@@ -70,7 +71,7 @@ export default function EmailVerification({ email }: Readonly<Props>) {
                         <Alert variant="light" color="green" title="Email sent!" style={{ marginBottom: '1em' }} hidden={verificationError}>
                             Make sure to check your spam folder
                         </Alert>
-                        <Button onClick={verify}>I have clicked the link</Button>
+                        <Button onClick={verify} loading={verificationLoading}>I have clicked the link</Button>
                     </>)
                     : <Button onClick={sendVerificationLink} loading={sending}>Send verifcation link</Button>
                 }

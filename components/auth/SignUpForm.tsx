@@ -1,12 +1,11 @@
 "use client"
 
 import { PasswordInput, TextInput, Button, Alert, Modal } from '@mantine/core';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { auth } from "../../firebase.config";
-import { useCreateUserWithEmailAndPassword, useSendEmailVerification, useUpdateProfile } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useUpdateProfile } from 'react-firebase-hooks/auth';
 import ErrorUtils from '../../utils/errorUtils';
 import { useDisclosure } from '@mantine/hooks'
-import EmailVerification from './EmailVerification';
 
 export default function SignUpForm() {
 	const [username, setUsername] = useState("");
@@ -17,19 +16,12 @@ export default function SignUpForm() {
 	const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
 	const [opened, { open, close }] = useDisclosure(false);
 	const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
-	const [openEmailVerifyModal, setOpenModalVerifyModal] = useState(false);
 	const [
 		createUserWithEmailAndPassword,
 		user,
 		loading,
 		error,
 	] = useCreateUserWithEmailAndPassword(auth);
-
-	useEffect(() => {
-		if (openEmailVerifyModal) {
-			close()
-		}
-	}, [openEmailVerifyModal])
 
 	if (errorUpdate) {
 		console.log(errorUpdate)
@@ -44,7 +36,6 @@ export default function SignUpForm() {
 		const user = await createUserWithEmailAndPassword(email, password);
 		if (user) {
 			await updateProfile({ displayName: username })
-			setOpenModalVerifyModal(true)
 		}
 	}
 
@@ -97,7 +88,6 @@ export default function SignUpForm() {
 					<Button type='submit' loading={loading} disabled={submitButtonDisabled}>Sign up</Button>
 				</form>
 			</Modal>
-			{openEmailVerifyModal ? <EmailVerification email={email} /> : ""}
 			<Button onClick={open}>Sign up</Button>
 		</>
 	)
