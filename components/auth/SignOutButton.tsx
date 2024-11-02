@@ -3,6 +3,7 @@ import { Button } from '@mantine/core'
 import { auth } from "../../firebase.config"
 
 export default function SignOutButton() {
+	
 	const [signOut, loading, error] = useSignOut(auth);
 
 	if (error) {
@@ -16,7 +17,8 @@ export default function SignOutButton() {
 				const success = await signOut();
 				if (success) {
 
-				}}}
+				}
+			}}
 		>Sign out</Button>
 	)
 

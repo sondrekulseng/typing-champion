@@ -19,6 +19,7 @@ let errorCount = 0
 let currentWordErrorCount = 0
 
 export default function TypingGame(props: Props) {
+	
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
 	const [user, setUser] = useState(props.userEmail)
@@ -37,8 +38,8 @@ export default function TypingGame(props: Props) {
 			collection(db, 'scores'),
 			where("textId", "==", textData.id),
 			where("userId", "==", props.user != null ? props.user.uid : "")
-			)
-		);
+		)
+	);
 
 	function resetGame() {
 		setTextData(props.textData)
@@ -74,8 +75,8 @@ export default function TypingGame(props: Props) {
 			// Wrong char is typed
 			errorCount++
 			currentWordErrorCount++
-			setTextContent(content => textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
-			setErrorText(content => textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
+			setErrorText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
 			return
 		}
 
@@ -144,7 +145,7 @@ export default function TypingGame(props: Props) {
 		} else {
 			const storedWpm = snapshot.docs[0].data().wpm;
 			if (wpm > storedWpm) {
-				updateDoc(snapshot.docs[0].ref, {wpm: wpm })
+				updateDoc(snapshot.docs[0].ref, { wpm: wpm })
 			}
 		}
 		resetGame()
@@ -152,51 +153,49 @@ export default function TypingGame(props: Props) {
 
 	function startTimer() {
 		const intervalId = setInterval(() => {
-			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1)*100)/100);
+			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1) * 100) / 100);
 		}, 100);
 		setIntervalId(intervalId)
 	}
 
 	return (
 		<>
-		<h3>
-			<span style={{backgroundColor: 'rgba(51, 170, 51, .6)'}}>{writtenText}</span>
-			<span style={{backgroundColor: 'rgba(247, 2, 2, .6)'}}>{errorText}</span>
-			{textContent}
-		</h3>
-		<TextInput
-			placeholder="Write in the text"
-			onChange={e => checkText(e.target.value)}
-			onKeyDown={e => {
-				const inputValue = e.target.value
-				if (e.key == "Backspace" && inputValue.length > 0) {
-					handleCharDelete(inputValue)
-					setUserInput(inputValue.slice(0, e.target.value.length - 1))
-					e.preventDefault();
-				}
-				if (e.key === "ArrowLeft") {
-					e.preventDefault();
-  				}
-			}}
+			<h3>
+				<span style={{ backgroundColor: 'rgba(51, 170, 51, .6)' }}>{writtenText}</span>
+				<span style={{ backgroundColor: 'rgba(247, 2, 2, .6)' }}>{errorText}</span>
+				{textContent}
+			</h3>
+			<TextInput
+				placeholder="Write in the text"
+				onChange={e => checkText(e.target.value)}
+				onKeyDown={e => {
+					const inputValue = e.target.value
+					if (e.key == "Backspace" && inputValue.length > 0) {
+						handleCharDelete(inputValue)
+						setUserInput(inputValue.slice(0, e.target.value.length - 1))
+						e.preventDefault();
+					}
+					if (e.key === "ArrowLeft") {
+						e.preventDefault();
+					}
+				}}
 
-			value={userInput}
-			disabled={gameFinished} 
-		/>
-		{seconds} s <br />
-		{gameFinished
-			? <Alert variant="light" color="blue" title="Game finished!" style={{marginTop: '1em'}}>
-		  		<h3>Words typed: {wordCount}</h3>
-				<h3>Errors: {errorCount}</h3>
-				<h3>Elapsed time: {seconds}s</h3>
-				<h3>WPM: {wpm}</h3>
-				<h3>Accuracy: {accuracy} %</h3>
-				{props.user != undefined
-					? <Button onClick={submitScore}>Submit score</Button>
-					: <Button onClick={resetGame}>Reset game</Button>
-				}
-			  </Alert>
-			: ""
-		}
+				value={userInput}
+				disabled={gameFinished}
+			/>
+			{seconds} s <br />
+			{gameFinished
+				? <Alert variant="light" color="blue" title="Game finished!" style={{ marginTop: '1em' }}>
+					<h3>WPM: {wpm}</h3>
+					<h3>Accuracy: {accuracy}% ({errorCount} errors)</h3>
+					<h3>Elapsed time: {seconds}s</h3>
+					{props.user != undefined
+						? <Button onClick={submitScore}>Submit score</Button>
+						: <Button onClick={resetGame}>Reset game</Button>
+					}
+				</Alert>
+				: ""
+			}
 		</>
 	)
 }

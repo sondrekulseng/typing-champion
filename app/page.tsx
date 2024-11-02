@@ -1,7 +1,6 @@
 'use client'
 
-import { auth, db } from "../firebase.config"
-import { useAuthState } from 'react-firebase-hooks/auth'
+import { db } from "../firebase.config"
 import { useRouter, usePathname } from 'next/navigation'
 import { Select, LoadingOverlay, Loader } from '@mantine/core'
 import { useCollection } from 'react-firebase-hooks/firestore'
@@ -10,6 +9,7 @@ import TextData from '../models/TextData'
 import { useState } from 'react'
 
 export default function Home() {
+
   let texts = new Map<string, TextData>()
   const { push } = useRouter();
   const pathname = usePathname();
@@ -21,11 +21,9 @@ export default function Home() {
       snapshotListenOptions: { includeMetadataChanges: true },
     }
   );
-  const [user, userLoad, userError] = useAuthState(auth)
 
   if (loading) {
     return <Loader color="blue" />
-    
   }
 
   if (error) {
