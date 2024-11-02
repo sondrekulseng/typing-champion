@@ -8,7 +8,7 @@ type Props = {
     email: string
 }
 export default function EmailVerification({ email }: Readonly<Props>) {
-
+    
     const [opened, { close }] = useDisclosure(true);
     const [emailSent, setEmailSent] = useState(false);
     const [verificationLoading, setVerifcationLoading] = useState(false);

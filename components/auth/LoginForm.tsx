@@ -8,12 +8,12 @@ import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { useDisclosure } from '@mantine/hooks'
 
 export default function LoginForm() {
+	
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [opened, { open, close }] = useDisclosure(false);
 	const [
 		signInWithEmailAndPassword,
-		user,
 		loading,
 		error,
 	] = useSignInWithEmailAndPassword(auth);

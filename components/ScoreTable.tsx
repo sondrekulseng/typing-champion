@@ -11,17 +11,16 @@ type Props = {
 	user: any
 }
 export default function ScoreTable(props: Props) {
-
+	
 	const [showPersonalScores, setShowPersonalScores] = useState(false);
-	const [scores, setScores] = useState([]);
 	const [scoreQuery, setScoreQuery] = useState(
 		query(
 			collection(db, 'scores'),
 			where("textId", "==", props.textId),
 			orderBy("wpm", "desc"),
 			limit(10)
-			)
 		)
+	)
 	const [snapshot, loading, error] = useCollection(scoreQuery);
 
 	useEffect(() => {
@@ -33,8 +32,8 @@ export default function ScoreTable(props: Props) {
 					where("userId", "==", props.user.uid),
 					orderBy("wpm", "desc"),
 					limit(10)
-					)
 				)
+			)
 		} else {
 			setScoreQuery(
 				query(
@@ -42,8 +41,8 @@ export default function ScoreTable(props: Props) {
 					where("textId", "==", props.textId),
 					orderBy("wpm", "desc"),
 					limit(10)
-					)
 				)
+			)
 		}
 	}, [showPersonalScores, props])
 
@@ -58,37 +57,37 @@ export default function ScoreTable(props: Props) {
 	if (snapshot) {
 		const rows = snapshot.docs.map((doc, index) => (
 			<Table.Tr key={doc.id}>
-			<Table.Td>{index + 1}</Table.Td>
-			<Table.Td>{index == 0 ? `${doc.data().displayName} 👑` : doc.data().displayName}</Table.Td>
-			<Table.Td>{doc.data().wpm}</Table.Td>
-			<Table.Td>{doc.data().accuracy}%</Table.Td>
+				<Table.Td>{index + 1}</Table.Td>
+				<Table.Td>{index == 0 ? `${doc.data().displayName} 👑` : doc.data().displayName}</Table.Td>
+				<Table.Td>{doc.data().wpm}</Table.Td>
+				<Table.Td>{doc.data().accuracy}%</Table.Td>
 			</Table.Tr>
-			));
+		));
 
 		return (
 			<>
-			<Table style={{marginBottom: '1em'}}>
-			<Table.Thead>
-			<Table.Tr>
-			<Table.Th>#</Table.Th>
-			<Table.Th>User</Table.Th>
-			<Table.Th>WPM</Table.Th>
-			<Table.Th>Accuracy</Table.Th>
-			</Table.Tr>
-			</Table.Thead>
-			<Table.Tbody>{rows}</Table.Tbody>
-			</Table>
-			{props.user == undefined
-				? <Alert variant="light" color="blue" title="Not logged in">
-					Login to submit scores
-				  </Alert>
-				: 
-					<Checkbox 
-						label="Show personal highscore" 
-						checked={showPersonalScores} 
-						onChange={evt => setShowPersonalScores(evt.currentTarget.checked)} 
-				  	/>
-			}
+				<Table style={{ marginBottom: '1em' }}>
+					<Table.Thead>
+						<Table.Tr>
+							<Table.Th>#</Table.Th>
+							<Table.Th>User</Table.Th>
+							<Table.Th>WPM</Table.Th>
+							<Table.Th>Accuracy</Table.Th>
+						</Table.Tr>
+					</Table.Thead>
+					<Table.Tbody>{rows}</Table.Tbody>
+				</Table>
+				{props.user == undefined
+					? <Alert variant="light" color="blue" title="Not logged in">
+						Login to submit scores
+					</Alert>
+					:
+					<Checkbox
+						label="Show personal highscore"
+						checked={showPersonalScores}
+						onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
+					/>
+				}
 			</>
 		)
 	}

@@ -19,6 +19,7 @@ let errorCount = 0
 let currentWordErrorCount = 0
 
 export default function TypingGame(props: Props) {
+	
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
 	const [user, setUser] = useState(props.userEmail)
