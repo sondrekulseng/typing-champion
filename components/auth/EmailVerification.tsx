@@ -49,7 +49,7 @@ export default function EmailVerification({ email }: Readonly<Props>) {
         <>
             <Modal opened={opened} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
                 <h3>Please verify your email</h3>
-                <p>Click the button below to send a verification link to: {email}</p>
+                <p>A verification link will be sent to: {email}</p>
                 {error
                     ? (<>
                         <Alert variant="light" color="red" title="Could not send email" style={{ marginBottom: '1em' }}>
