@@ -1,7 +1,7 @@
 "use client"
 
 import { PasswordInput, TextInput, Button, Alert, Modal } from '@mantine/core';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { auth } from "../../firebase.config";
 import { useCreateUserWithEmailAndPassword, useUpdateProfile } from 'react-firebase-hooks/auth';
 import ErrorUtils from '../../utils/errorUtils';
@@ -14,6 +14,7 @@ export default function SignUpForm() {
 	const [passwordConfirm, setPasswordConfirm] = useState("");
 	const [showPasswordErrorAlert, setShowPasswordErrorAlert] = useState(false);
 	const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
+	const [showFirebaseAuthError, setShowFirebaseAuthError] = useState(false);
 	const [opened, { open, close }] = useDisclosure(false);
 	const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
 	const [
@@ -22,6 +23,12 @@ export default function SignUpForm() {
 		loading,
 		error
 	] = useCreateUserWithEmailAndPassword(auth);
+
+	useEffect(() => {
+		if (error != undefined) {
+			setShowFirebaseAuthError(true)
+		}
+	}, [error]);
 
 	if (errorUpdate) {
 		console.log(errorUpdate)
@@ -51,6 +58,7 @@ export default function SignUpForm() {
 
 	function handleClose() {
 		setShowPasswordErrorAlert(false)
+		setShowFirebaseAuthError(false)
 		close()
 	}
 
@@ -65,13 +73,13 @@ export default function SignUpForm() {
 							verifyPassword(e.target.value, passwordConfirm)
 							return e.target.value
 						}))
-					 }} required />
+					}} required />
 					<PasswordInput placeholder="*******" label="Confirm password" onChange={e => {
 						setPasswordConfirm((current => {
 							verifyPassword(password, e.target.value)
 							return e.target.value
 						}))
-					 }} required />
+					}} required />
 					<br />
 					{showPasswordErrorAlert
 						? <Alert variant="light" color="red" title="Error" style={{ marginBottom: '1em' }}>
@@ -79,7 +87,7 @@ export default function SignUpForm() {
 						</Alert>
 						: ""
 					}
-					{error
+					{showFirebaseAuthError && error != undefined
 						? <Alert variant="light" color="red" title="Signup error" style={{ marginBottom: '1em' }}>
 							<strong>{ErrorUtils.parseError(error.message)}</strong>
 						</Alert>
