@@ -20,7 +20,7 @@ export default function SignUpForm() {
 		createUserWithEmailAndPassword,
 		user,
 		loading,
-		error,
+		error
 	] = useCreateUserWithEmailAndPassword(auth);
 
 	if (errorUpdate) {

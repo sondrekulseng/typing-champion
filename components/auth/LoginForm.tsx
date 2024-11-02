@@ -14,8 +14,9 @@ export default function LoginForm() {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [
 		signInWithEmailAndPassword,
+		user,
 		loading,
-		error,
+		error
 	] = useSignInWithEmailAndPassword(auth);
 
 	async function handleLogin(evt: FormEvent<HTMLFormElement>) {
