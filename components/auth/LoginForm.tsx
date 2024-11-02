@@ -6,6 +6,7 @@ import { auth } from "../../firebase.config";
 import ErrorUtils from '../../utils/errorUtils';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { useDisclosure } from '@mantine/hooks'
+import Link from 'next/link';
 
 export default function LoginForm() {
 	
@@ -50,6 +51,7 @@ export default function LoginForm() {
 						: ""
 					}
 					<Button type='submit' loading={loading}>Login</Button>
+					<p><Link href="/passwordReset" target="_blank">Forgot password?</Link></p>
 				</form>
 			</Modal>
 			<Button onClick={open}>Login</Button>
