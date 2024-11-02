@@ -15,6 +15,6 @@ export default class ErrorUtils {
 		if (errorMessage.includes("auth/weak-password")) {
 			return "Password should be at least 6 characters.";
 		}
-		return "Unknown authentication error occured"
+		return "Unknown authentication error occured";
 	}
 }
