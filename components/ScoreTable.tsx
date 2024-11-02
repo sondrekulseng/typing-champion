@@ -11,7 +11,7 @@ type Props = {
 	user: any
 }
 export default function ScoreTable(props: Props) {
-	
+
 	const [showPersonalScores, setShowPersonalScores] = useState(false);
 	const [scoreQuery, setScoreQuery] = useState(
 		query(
@@ -65,8 +65,9 @@ export default function ScoreTable(props: Props) {
 		));
 
 		return (
-			<>
-				<Table style={{ marginBottom: '1em' }}>
+			<>{rows.length == 0
+				? <p><strong>The leaderbord is empty. Be the first!</strong></p>
+				: <Table style={{ marginBottom: '1em' }}>
 					<Table.Thead>
 						<Table.Tr>
 							<Table.Th>#</Table.Th>
@@ -77,16 +78,18 @@ export default function ScoreTable(props: Props) {
 					</Table.Thead>
 					<Table.Tbody>{rows}</Table.Tbody>
 				</Table>
+			}
 				{props.user == undefined
 					? <Alert variant="light" color="blue" title="Not logged in">
-						Login to submit scores
+						Login or sign up to submit highscore!
 					</Alert>
-					:
-					<Checkbox
-						label="Show personal highscore"
-						checked={showPersonalScores}
-						onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
-					/>
+					: rows.length == 0
+						? ""
+						: <Checkbox
+							label="Show personal highscore"
+							checked={showPersonalScores}
+							onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
+						/>
 				}
 			</>
 		)

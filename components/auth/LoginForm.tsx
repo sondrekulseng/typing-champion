@@ -44,7 +44,7 @@ export default function LoginForm() {
 					<TextInput label="Email" placeholder="example@mail.com" onChange={e => setEmail(e.target.value)} required />
 					<PasswordInput label="Password" placeholder="*******" onChange={e => setPassword(e.target.value)} required />
 					<br />
-					{showFirebaseAuthError && error != undefined
+					{showFirebaseAuthError && error
 						? <Alert variant="light" color="red" title="Login error" style={{ marginBottom: '1em' }}>
 							<strong>{ErrorUtils.parseError(error.message)}</strong>
 						</Alert>

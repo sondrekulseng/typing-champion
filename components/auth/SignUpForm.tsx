@@ -87,7 +87,7 @@ export default function SignUpForm() {
 						</Alert>
 						: ""
 					}
-					{showFirebaseAuthError && error != undefined
+					{showFirebaseAuthError && error
 						? <Alert variant="light" color="red" title="Signup error" style={{ marginBottom: '1em' }}>
 							<strong>{ErrorUtils.parseError(error.message)}</strong>
 						</Alert>
