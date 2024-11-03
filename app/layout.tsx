@@ -18,10 +18,15 @@ export default function RootLayout({
 }) {
 
   const [showCookieConsentModal, setShowCookieConsentModal] = useState(true);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem('cookiesConsented')) {
+    if (localStorage.getItem('requiredCookiesConsented')) {
       setShowCookieConsentModal(false);
+    }
+    if (localStorage.getItem('analyticsCookiesConsented')) {
+      const analytics = localStorage.getItem('analyticsCookiesConsented')
+      setAnalyticsEnabled(analytics == 'true')
     }
   }, [])
 
@@ -54,7 +59,7 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme} forceColorScheme={'dark'}>
-          <AnalyticsProvider>
+          <AnalyticsProvider enabled={analyticsEnabled}>
             <div style={{ margin: 'auto', width: '80%' }}>
               <h1>
                 <Link href="/" style={{ color: 'white' }}>Typing champion ✍️</Link>

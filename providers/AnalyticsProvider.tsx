@@ -3,14 +3,17 @@ import { getAnalytics } from "firebase/analytics";
 import { useEffect } from "react";
 
 type Props = {
-  children: React.ReactNode
+  children: React.ReactNode,
+  enabled: boolean
 }
 
-const AnalyticsProvider = ({ children }: Readonly<Props>) => {
+const AnalyticsProvider = ({ children, enabled }: Readonly<Props>) => {
 
   useEffect(() => {
-    getAnalytics(app)
-  }, [children]);
+    if (enabled) {
+      getAnalytics(app)
+    }
+  }, []);
 
   return children;
 };
