@@ -1,6 +1,6 @@
 'use client'
 
-import { MantineProvider, Notification, createTheme } from '@mantine/core';
+import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import './globals.css'
 import Link from 'next/link';
