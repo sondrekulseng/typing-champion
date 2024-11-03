@@ -1,10 +1,8 @@
-import TextData from '/models/TextData'
+import TextData from '../models/TextData'
 import { useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core'
-import { useEffect } from 'react'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
-import { auth, db } from "/firebase.config"
-import firebase from "firebase/app"
+import { db } from "../firebase.config"
 import { useCollection } from 'react-firebase-hooks/firestore'
 
 type Props = {
@@ -22,7 +20,6 @@ export default function TypingGame(props: Props) {
 	
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
-	const [user, setUser] = useState(props.userEmail)
 	const [userInput, setUserInput] = useState("")
 	const [seconds, setSeconds] = useState(0)
 	const [gameStarted, setGameStarted] = useState(false)

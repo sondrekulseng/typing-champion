@@ -5,7 +5,6 @@ import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react'
 import { auth } from "../../firebase.config";
 import { useCreateUserWithEmailAndPassword, useUpdateProfile } from 'react-firebase-hooks/auth';
 import ErrorUtils from '../../utils/errorUtils';
-import { useDisclosure } from '@mantine/hooks'
 
 type Props = {
 	open: boolean,

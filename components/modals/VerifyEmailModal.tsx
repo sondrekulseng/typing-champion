@@ -1,8 +1,7 @@
 import { auth } from "@/firebase.config";
 import { Alert, Button, Modal } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { Dispatch, SetStateAction, useState } from "react";
-import { useAuthState, useSendEmailVerification } from "react-firebase-hooks/auth";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useSendEmailVerification } from "react-firebase-hooks/auth";
 
 type Props = {
     open: boolean,
@@ -15,6 +14,12 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
     const [verificationLoading, setVerifcationLoading] = useState(false);
     const [verificationError, setVerificationError] = useState(false);
     const [sendEmailVerification, sending, error] = useSendEmailVerification(auth);
+
+    useEffect(() => {
+        setVerificationError(false)
+        setEmailSent(false)
+        setVerifcationLoading(false)
+    }, [open])
 
     async function sendVerificationLink() {
         const linkSent = await sendEmailVerification();
@@ -39,12 +44,12 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
         } else {
             setVerificationError(true)
         }
-        setEmailSent(false);
         setVerifcationLoading(false)
     }
 
     async function closeAndSignOut() {
         await auth.signOut();
+        setVerificationError(false);
         setOpen(false);
         close();
     }
@@ -56,7 +61,7 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
                 <p>A verification link will be sent to: {email}</p>
                 {error
                     ? (<>
-                        <Alert variant="light" color="red" title="Could not send email" style={{ marginBottom: '1em' }}>
+                        <Alert variant="light" color="red" title="Error sending email" style={{ marginBottom: '1em' }}>
                             An error occured while sending verificaiton email. Please try again.
                         </Alert>
                     </>)
