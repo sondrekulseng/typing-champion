@@ -17,7 +17,7 @@ export default function SignUpModal({ open, setOpen }: Readonly<Props>) {
 	const [password, setPassword] = useState("");
 	const [passwordConfirm, setPasswordConfirm] = useState("");
 	const [showPasswordErrorAlert, setShowPasswordErrorAlert] = useState(false);
-	const [submitButtonDisabled, setSubmitButtonDisabled] = useState(true);
+	const [submitButtonDisabled, setSubmitButtonDisabled] = useState(false);
 	const [showFirebaseAuthError, setShowFirebaseAuthError] = useState(false);
 	const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
 	const [
@@ -53,8 +53,10 @@ export default function SignUpModal({ open, setOpen }: Readonly<Props>) {
 		if (passInput != passInputConfirm) {
 			setShowPasswordErrorAlert(true)
 			setSubmitButtonDisabled(true)
+			setSubmitButtonDisabled(true)
 		} else {
 			setShowPasswordErrorAlert(false)
+			setSubmitButtonDisabled(false)
 			setSubmitButtonDisabled(false)
 		}
 	}
