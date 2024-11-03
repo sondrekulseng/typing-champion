@@ -65,20 +65,21 @@ export default function ScoreTable(props: Props) {
 		));
 
 		return (
-			<>{rows.length == 0
-				? <p><strong>The leaderbord is empty. Be the first!</strong></p>
-				: <Table style={{ marginBottom: '1em' }}>
-					<Table.Thead>
-						<Table.Tr>
-							<Table.Th>#</Table.Th>
-							<Table.Th>User</Table.Th>
-							<Table.Th>WPM</Table.Th>
-							<Table.Th>Accuracy</Table.Th>
-						</Table.Tr>
-					</Table.Thead>
-					<Table.Tbody>{rows}</Table.Tbody>
-				</Table>
-			}
+			<>
+				{rows.length == 0
+					? <p><strong>The leaderbord is empty. Be the first!</strong></p>
+					: <Table style={{ marginBottom: '1em' }}>
+						<Table.Thead>
+							<Table.Tr>
+								<Table.Th>#</Table.Th>
+								<Table.Th>User</Table.Th>
+								<Table.Th>WPM</Table.Th>
+								<Table.Th>Accuracy</Table.Th>
+							</Table.Tr>
+						</Table.Thead>
+						<Table.Tbody>{rows}</Table.Tbody>
+					</Table>
+				}
 				{props.user == undefined
 					? <Alert variant="light" color="blue" title="Not logged in">
 						Login or sign up to submit highscore!

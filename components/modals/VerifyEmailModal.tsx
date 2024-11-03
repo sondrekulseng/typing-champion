@@ -55,36 +55,34 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
     }
 
     return (
-        <>
-            <Modal opened={open} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
-                <h3>Please verify your email</h3>
-                <p>A verification link will be sent to: {email}</p>
-                {error
-                    ? (<>
-                        <Alert variant="light" color="red" title="Error sending email" style={{ marginBottom: '1em' }}>
-                            An error occured while sending verificaiton email. Please try again.
-                        </Alert>
-                    </>)
-                    : ""
-                }
-                {verificationError
-                    ? (<>
-                        <Alert variant="light" color="red" title="Not verified" style={{ marginBottom: '1em' }}>
-                            Email not verified. Please click the link in your email.
-                        </Alert>
-                    </>)
-                    : ""
-                }
-                {emailSent
-                    ? (<>
-                        <Alert variant="light" color="green" title="Email sent!" style={{ marginBottom: '1em' }} hidden={verificationError}>
-                            Make sure to check your spam folder
-                        </Alert>
-                        <Button onClick={verify} loading={verificationLoading}>I have clicked the link</Button>
-                    </>)
-                    : <Button onClick={sendVerificationLink} loading={sending}>Send verifcation link</Button>
-                }
-            </Modal>
-        </>
+        <Modal opened={open} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+            <h3>Please verify your email</h3>
+            <p>A verification link will be sent to: {email}</p>
+            {error
+                ? (<>
+                    <Alert variant="light" color="red" title="Error sending email" style={{ marginBottom: '1em' }}>
+                        An error occured while sending verificaiton email. Please try again.
+                    </Alert>
+                </>)
+                : ""
+            }
+            {verificationError
+                ? (<>
+                    <Alert variant="light" color="red" title="Not verified" style={{ marginBottom: '1em' }}>
+                        Email not verified. Please click the link in your email.
+                    </Alert>
+                </>)
+                : ""
+            }
+            {emailSent
+                ? (<>
+                    <Alert variant="light" color="green" title="Email sent!" style={{ marginBottom: '1em' }} hidden={verificationError}>
+                        Make sure to check your spam folder
+                    </Alert>
+                    <Button onClick={verify} loading={verificationLoading}>I have clicked the link</Button>
+                </>)
+                : <Button onClick={sendVerificationLink} loading={sending}>Send verifcation link</Button>
+            }
+        </Modal>
     )
 }

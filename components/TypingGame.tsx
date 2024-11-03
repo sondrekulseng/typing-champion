@@ -4,10 +4,11 @@ import { TextInput, Alert, Button } from '@mantine/core'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
 import { db } from "../firebase.config"
 import { useCollection } from 'react-firebase-hooks/firestore'
+import { User } from 'firebase/auth'
 
 type Props = {
 	textData: TextData,
-	user: Firebase.User | undefined
+	user: User | undefined | null
 }
 
 let wordCount = 0
@@ -24,7 +25,7 @@ export default function TypingGame(props: Props) {
 	const [seconds, setSeconds] = useState(0)
 	const [gameStarted, setGameStarted] = useState(false)
 	const [gameFinished, setGameFinished] = useState(false)
-	const [intervalId, setIntervalId] = useState()
+	const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>()
 	const [wpm, setWpm] = useState(0)
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
@@ -65,8 +66,8 @@ export default function TypingGame(props: Props) {
 		}
 
 		setUserInput(userInput)
-		const userChar: char = userInput.charAt(userInput.length - 1)
-		const answerChar: char = textData.content.charAt(correctChars)
+		const userChar = userInput.charAt(userInput.length - 1)
+		const answerChar = textData.content.charAt(correctChars)
 
 		if (userChar != answerChar || currentWordErrorCount > 0) {
 			// Wrong char is typed
@@ -109,8 +110,8 @@ export default function TypingGame(props: Props) {
 	}
 
 	function handleCharDelete(userInput: string) {
-		const userChar: char = userInput.charAt(userInput.length - 1)
-		const answerChar: char = textData.content.charAt(correctChars - 1)
+		const userChar = userInput.charAt(userInput.length - 1)
+		const answerChar = textData.content.charAt(correctChars - 1)
 
 		if (userChar != answerChar || currentWordErrorCount > 0) {
 			// Delete error char
@@ -131,6 +132,10 @@ export default function TypingGame(props: Props) {
 	}
 
 	function submitScore() {
+		if (snapshot == undefined || props.user == undefined) {
+			alert("Error submitting your score. Try again later.")
+			return;
+		}
 		if (snapshot.docs.length == 0) {
 			addDoc(collection(db, "scores"), {
 				textId: textData.id,
@@ -166,10 +171,11 @@ export default function TypingGame(props: Props) {
 				placeholder="Write in the text"
 				onChange={e => checkText(e.target.value)}
 				onKeyDown={e => {
-					const inputValue = e.target.value
+					const target = e.target as HTMLTextAreaElement;
+					const inputValue = target.value
 					if (e.key == "Backspace" && inputValue.length > 0) {
 						handleCharDelete(inputValue)
-						setUserInput(inputValue.slice(0, e.target.value.length - 1))
+						setUserInput(inputValue.slice(0, inputValue.length - 1))
 						e.preventDefault();
 					}
 					if (e.key === "ArrowLeft") {
