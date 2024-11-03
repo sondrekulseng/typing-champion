@@ -4,7 +4,7 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import './globals.css'
 import Link from 'next/link';
-import AnalyticsProvider from './providers/AnalyticsProvider';
+import AnalyticsProvider from '../providers/AnalyticsProvider';
 
 const theme = createTheme({
 });
@@ -16,9 +16,10 @@ export default function RootLayout({
 }) {
 
   return (
-    <html lang="en">
+    <html lang='en'>
       <head>
         <title>Typing champion</title>
+        <link rel='icon' type='image/x-icon' href='/favicon.ico' />
       </head>
       <body>
         <MantineProvider theme={theme} forceColorScheme={'dark'}>

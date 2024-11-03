@@ -6,13 +6,13 @@ import { doc } from 'firebase/firestore';
 import { auth, db } from "../../../firebase.config"
 import TypingGame from '@/components/TypingGame';
 import TextData from '../../../models/TextData';
-import ScoreTable from '@/components/ScoreTable';
-import SignOutButton from '@/components/auth/SignOutButton';
-import SignUpForm from '@/components/auth/SignUpForm';
-import LoginForm from '@/components/auth/LoginForm';
-import { Alert, Paper } from '@mantine/core';
+import ScoreTable from '@/components/tables/ScoreTable';
+import SignOutButton from '@/components/buttons/SignOutButton';
+import SignUpModal from '@/components/modals/SignUpModal';
+import LoginModal from '@/components/modals/LoginModal';
+import { Alert, Button, Paper } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import EmailVerification from '@/components/auth/EmailVerification';
+import VerifyEmailModal from '@/components/modals/VerifyEmailModal';
 
 type Props = {
     params: { textId: string }
@@ -21,18 +21,27 @@ type Props = {
 export default function Page({ params }: Readonly<Props>) {
 
     const [user, userLoad, userError] = useAuthState(auth)
-    const [openEmailVerifyModal, setOpenModalVerifyModal] = useState(false)
+    const [userEmail, setUserEmail] = useState("")
+
+    const [openLoginModal, setOpenLoginModal] = useState(false)
+    const [openSignUpModal, setOpenSignUpModal] = useState(false)
+    const [openVerifyEmailModal, setOpenVerifyEmailModal] = useState(false)
 
     useEffect(() => {
-        if (user == undefined) {
-            setOpenModalVerifyModal(false)
+        if (user == undefined || user == null) {
+            setOpenVerifyEmailModal(false)
             return
         }
+
+        if (user.email != null) {
+            setUserEmail(user.email)
+            setOpenLoginModal(false)
+            setOpenSignUpModal(false)
+        }
+
         if (!user.emailVerified) {
-            setOpenModalVerifyModal(true)
-            return
+            setOpenVerifyEmailModal(true)
         }
-        user.reload().finally
     }, [user])
 
     const [document, loading, error] = useDocument(
@@ -45,7 +54,7 @@ export default function Page({ params }: Readonly<Props>) {
     }
 
     if (error) {
-        return error.message
+        return <h3>An error occured. Try refreshing the page.</h3>
     }
 
     if (document) {
@@ -58,6 +67,7 @@ export default function Page({ params }: Readonly<Props>) {
             document.data()?.title,
             document.data()?.content
         );
+
         return (
             <>
                 <div style={{ float: 'left', width: '70%' }}>
@@ -73,19 +83,25 @@ export default function Page({ params }: Readonly<Props>) {
                         ? (
                             <>
                                 <Alert variant="light" color="green" title="Logged in" style={{ marginTop: '1em', marginBottom: '1em' }}>
-                                    Email: {user.email}
+                                    Email: {userEmail}
                                 </Alert>
                                 <SignOutButton />
                             </>
                         )
                         : (
-                            <>
-                                <br />
-                                <LoginForm /> / <SignUpForm />
-                            </>
+                            <div style={{ marginTop: '1em' }}>
+                                <Button onClick={() => setOpenLoginModal(true)}>Login</Button> |
+                                <Button onClick={() => setOpenSignUpModal(true)}>Sign up</Button>
+                            </div>
                         )
                     }
-                    {openEmailVerifyModal && user ? <EmailVerification email={user.email} /> : ""}
+                    <LoginModal open={openLoginModal} setOpen={setOpenLoginModal} />
+                    <SignUpModal open={openSignUpModal} setOpen={setOpenSignUpModal} />
+                    <VerifyEmailModal
+                        open={openVerifyEmailModal}
+                        setOpen={setOpenVerifyEmailModal}
+                        email={userEmail}
+                    />
                 </div>
             </>
         )

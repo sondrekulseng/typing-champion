@@ -1,4 +1,5 @@
-import { initAnalytics } from "@/firebase.config";
+import { app } from "@/firebase.config";
+import { getAnalytics } from "firebase/analytics";
 import { useEffect } from "react";
 
 type Props = {
@@ -6,11 +7,9 @@ type Props = {
 }
 
 const AnalyticsProvider = ({ children }: Readonly<Props>) => {
-  
+
   useEffect(() => {
-    initAnalytics().catch((error) =>
-      console.error("Error initializing analytics:", error)
-    );
+    getAnalytics(app)
   }, [children]);
 
   return children;

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { db } from "../firebase.config"
+import { db } from "../../firebase.config"
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { Table, Alert, Checkbox } from '@mantine/core'
 import { useState, useEffect } from 'react'

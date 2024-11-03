@@ -1,15 +1,16 @@
 import { auth } from "@/firebase.config";
 import { Alert, Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
-import { useSendEmailVerification } from "react-firebase-hooks/auth";
+import { Dispatch, SetStateAction, useState } from "react";
+import { useAuthState, useSendEmailVerification } from "react-firebase-hooks/auth";
 
 type Props = {
+    open: boolean,
+    setOpen: Dispatch<SetStateAction<boolean>>,
     email: string
 }
-export default function EmailVerification({ email }: Readonly<Props>) {
-    
-    const [opened, { close }] = useDisclosure(true);
+export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Props>) {
+
     const [emailSent, setEmailSent] = useState(false);
     const [verificationLoading, setVerifcationLoading] = useState(false);
     const [verificationError, setVerificationError] = useState(false);
@@ -33,21 +34,24 @@ export default function EmailVerification({ email }: Readonly<Props>) {
 
         if (emailVerified) {
             setVerificationError(false)
+            setOpen(false)
             close()
         } else {
             setVerificationError(true)
         }
+        setEmailSent(false);
         setVerifcationLoading(false)
     }
 
     async function closeAndSignOut() {
         await auth.signOut();
-        close()
+        setOpen(false);
+        close();
     }
 
     return (
         <>
-            <Modal opened={opened} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+            <Modal opened={open} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
                 <h3>Please verify your email</h3>
                 <p>A verification link will be sent to: {email}</p>
                 {error
