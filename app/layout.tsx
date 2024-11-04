@@ -4,52 +4,14 @@ import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import './globals.css'
 import Link from 'next/link';
-import AnalyticsProvider from '../providers/AnalyticsProvider';
-import { useEffect, useState } from 'react';
-import CookieModal from '@/components/modals/CookieModal';
 
-const theme = createTheme({
-});
+const theme = createTheme({});
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-
-  const [showCookieConsentModal, setShowCookieConsentModal] = useState(true);
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem('requiredCookiesConsented')) {
-      setShowCookieConsentModal(false);
-    }
-    if (localStorage.getItem('analyticsCookiesConsented')) {
-      const analytics = localStorage.getItem('analyticsCookiesConsented')
-      setAnalyticsEnabled(analytics == 'true')
-    }
-  }, [])
-
-  if (showCookieConsentModal) {
-    return (
-      <html lang='en'>
-        <head>
-          <title>Typing champion</title>
-          <link rel='icon' type='image/x-icon' href='/favicon.ico' />
-        </head>
-        <body>
-          <MantineProvider theme={theme} forceColorScheme={'dark'}>
-            <CookieModal open={showCookieConsentModal} setOpen={setShowCookieConsentModal} />
-            <div style={{ margin: 'auto', width: '80%' }}>
-              <h1>
-                <Link href="/" style={{ color: 'white' }}>Typing champion ✍️</Link>
-              </h1>
-            </div>
-          </MantineProvider>
-        </body>
-      </html>
-    )
-  }
 
   return (
     <html lang='en'>
@@ -59,14 +21,12 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme} forceColorScheme={'dark'}>
-          <AnalyticsProvider enabled={analyticsEnabled}>
-            <div style={{ margin: 'auto', width: '80%' }}>
-              <h1>
-                <Link href="/" style={{ color: 'white' }}>Typing champion ✍️</Link>
-              </h1>
-              {children}
-            </div>
-          </AnalyticsProvider>
+          <div style={{ margin: 'auto', width: '80%' }}>
+            <h1>
+              <Link href="/" style={{ color: 'white' }}>Typing champion ✍️</Link>
+            </h1>
+            {children}
+          </div>
         </MantineProvider>
       </body>
     </html>
