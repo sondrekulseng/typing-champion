@@ -53,11 +53,11 @@ export default function Header() {
                     <Group justify="space-between">
                         <Link href="/" style={{ color: 'white' }}><h2>Typing champion ✍️</h2></Link>
                         <Group gap={0} visibleFrom="sm">
-                            <Link href="/play/start" className={classes.link} style={pathname.includes('/play') ? { fontWeight: 'bold', textDecoration: 'underline' } : {}}>
-                                Play
+                            <Link href="/play/start" className={classes.link} style={pathname.includes('/play') ? { textDecoration: 'underline' } : {}}>
+                                <h3>Play</h3>
                             </Link>
-                            <Link href="/passwordReset" className={classes.link} style={pathname.includes('/passwordReset') ? { fontWeight: 'bold', textDecoration: 'underline' } : {}}>
-                                Reset password
+                            <Link href="/passwordReset" className={classes.link} style={pathname.includes('/passwordReset') ? { textDecoration: 'underline' } : {}}>
+                                <h3>Reset password</h3>
                             </Link>
                         </Group>
 

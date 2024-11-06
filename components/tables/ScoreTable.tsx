@@ -82,7 +82,7 @@ export default function ScoreTable(props: Props) {
 				}
 				{props.user == undefined
 					? <Alert variant="light" color="blue" title="Not logged in">
-						Login or sign up to submit highscore!
+						Login or sign up to submit high score!
 					</Alert>
 					: rows.length == 0
 						? ""

@@ -42,14 +42,14 @@ export default function Page({ params }: Readonly<Props>) {
 
         return (
             <div style={{ marginTop: '3em' }}>
-                <h3>Type the paragraph below:</h3>
                 <div style={{ float: 'left', width: '70%' }}>
+                    <h2>Type the paragraph below:</h2>
                     <Paper withBorder={true} style={{ padding: '1em' }}>
                         <TypingGame textData={textData} user={user} />
                     </Paper>
                 </div>
                 <div style={{ float: 'right', width: '25%' }}>
-                    <h3>Leaderboard</h3>
+                    <h2>Leaderboard</h2>
                     <ScoreTable textId={textData.id} user={user} />
                 </div>
             </div>
