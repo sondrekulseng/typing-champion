@@ -40,7 +40,6 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
         if (emailVerified) {
             setVerificationError(false)
             setOpen(false)
-            close()
         } else {
             setVerificationError(true)
         }
@@ -51,7 +50,6 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
         await auth.signOut();
         setVerificationError(false);
         setOpen(false);
-        close();
     }
 
     return (

@@ -11,7 +11,7 @@ export default function SignOutButton() {
 	}
 
 	return (
-		<Button loading={loading} onClick={signOut}>
+		<Button loading={loading} onClick={signOut} variant='default'>
 			Sign out
 		</Button>
 	)

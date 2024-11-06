@@ -39,7 +39,6 @@ export default function LoginModal({ open, setOpen }: Readonly<Props>) {
 	function handleClose() {
 		setShowFirebaseAuthError(false)
 		setOpen(false)
-		close()
 	}
 
 	return (

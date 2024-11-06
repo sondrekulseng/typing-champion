@@ -3,7 +3,7 @@
 import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import './globals.css'
-import Link from 'next/link';
+import Header from '@/components/header/Header';
 
 const theme = createTheme({});
 
@@ -22,9 +22,7 @@ export default function RootLayout({
       <body>
         <MantineProvider theme={theme} forceColorScheme={'dark'}>
           <div style={{ margin: 'auto', width: '80%' }}>
-            <h1>
-              <Link href="/" style={{ color: 'white' }}>Typing champion ✍️</Link>
-            </h1>
+            <Header />
             {children}
           </div>
         </MantineProvider>
