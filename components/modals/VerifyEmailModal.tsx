@@ -51,7 +51,6 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
         await auth.signOut();
         setVerificationError(false);
         setOpen(false);
-        close();
     }
 
     return (

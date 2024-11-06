@@ -65,7 +65,6 @@ export default function SignUpModal({ open, setOpen }: Readonly<Props>) {
 		setShowPasswordErrorAlert(false)
 		setShowFirebaseAuthError(false)
 		setOpen(false)
-		close()
 	}
 
 	return (
