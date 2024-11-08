@@ -21,7 +21,7 @@ export default function RootLayout({
             const newPath = pathname.replace(pathTextId, textId)
             push(newPath)
         }
-    }, [textId])
+    })
 
     return (
         <>
