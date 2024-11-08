@@ -35,7 +35,7 @@ export default function Page() {
 
     return (
         <Alert variant="light" color="red" title="Error" style={{ marginTop: '1em' }}>
-            You don't have access to this page
+            You are not authorized to access this page
         </Alert>
     )
 }

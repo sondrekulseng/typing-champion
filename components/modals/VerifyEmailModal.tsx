@@ -53,9 +53,9 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
     }
 
     return (
-        <Modal opened={open} onClose={closeAndSignOut} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
+        <Modal opened={open} onClose={closeAndSignOut} closeOnClickOutside={false} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
             <h3>Please verify your email</h3>
-            <p>A verification link will be sent to: {email}</p>
+            <p>A verification link will be sent to: <strong>{email}</strong></p>
             {error
                 ? (<>
                     <Alert variant="light" color="red" title="Error sending email" style={{ marginBottom: '1em' }}>
@@ -73,13 +73,21 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
                 : ""
             }
             {emailSent
-                ? (<>
-                    <Alert variant="light" color="green" title="Email sent!" style={{ marginBottom: '1em' }} hidden={verificationError}>
-                        Make sure to check your spam folder
-                    </Alert>
-                    <Button onClick={verify} loading={verificationLoading}>I have clicked the link</Button>
-                </>)
-                : <Button onClick={sendVerificationLink} loading={sending}>Send verifcation link</Button>
+                ? (
+                    <>
+                        <Alert variant="light" color="green" title="Email sent!" style={{ marginBottom: '1em' }} hidden={verificationError}>
+                            Make sure to check your spam folder
+                        </Alert>
+                        <Button onClick={verify} loading={verificationLoading}>I have clicked the link</Button>
+                        <p><i>Press ESC to abort and sign out</i></p>
+                    </>
+                )
+                : (
+                    <>
+                        <Button onClick={sendVerificationLink} loading={sending}>Send verifcation link</Button>
+                        <Button onClick={closeAndSignOut} color='#454545' style={{ marginLeft: '1em' }}>Cancel and sign out</Button>
+                    </>
+                )
             }
         </Modal>
     )

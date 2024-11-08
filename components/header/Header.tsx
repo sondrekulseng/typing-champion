@@ -66,6 +66,14 @@ export default function Header() {
                                 ? (
                                     <>
                                         {user.email}
+                                        {user.uid == '2UxpMawI4YX1f6h75tgK4bx0ye43'
+                                            ? (
+                                                <Button>
+                                                    <Link href='/admin'>Admin</Link>
+                                                </Button>
+                                            )
+                                            : ""
+                                        }
                                         <SignOutButton />
                                     </>
                                 )
