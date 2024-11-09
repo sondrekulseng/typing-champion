@@ -1,96 +1,99 @@
 "use client"
 
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { db } from "../../firebase.config"
+import { auth, db } from "../../firebase.config"
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { Table, Alert, Checkbox } from '@mantine/core'
 import { useState, useEffect } from 'react'
+import { useAuthState } from 'react-firebase-hooks/auth';
 
-type Props = {
-	textId: string,
-	user: any
-}
-export default function ScoreTable(props: Props) {
+export default function ScoreTable() {
 
+	const RESULT_LIMIT = 20
+	const [uid, setUid] = useState("")
+	const [user, userLoading, userError] = useAuthState(auth)
 	const [showPersonalScores, setShowPersonalScores] = useState(false);
 	const [scoreQuery, setScoreQuery] = useState(
 		query(
 			collection(db, 'scores'),
-			where("textId", "==", props.textId),
 			orderBy("wpm", "desc"),
-			limit(10)
+			limit(RESULT_LIMIT)
 		)
 	)
 	const [snapshot, loading, error] = useCollection(scoreQuery);
 
 	useEffect(() => {
+		if (user) {
+			setUid(user.uid)
+		} else {
+			setUid("")
+		}
 		if (showPersonalScores) {
 			setScoreQuery(
 				query(
 					collection(db, 'scores'),
-					where("textId", "==", props.textId),
-					where("userId", "==", props.user.uid),
+					where("uid", "==", uid),
 					orderBy("wpm", "desc"),
-					limit(10)
+					limit(RESULT_LIMIT)
 				)
 			)
 		} else {
 			setScoreQuery(
 				query(
 					collection(db, 'scores'),
-					where("textId", "==", props.textId),
 					orderBy("wpm", "desc"),
-					limit(10)
+					limit(RESULT_LIMIT)
 				)
 			)
 		}
-	}, [showPersonalScores, props])
+	}, [showPersonalScores, user])
 
-	if (loading) {
+	if (loading || userLoading) {
 		return <p>Loading scores...</p>
 	}
 
-	if (error) {
-		return <Alert variant="light" color="red" title="Error loading scores">An error occured while fetching scores. Try again later</Alert>
+	if (error || userError) {
+		console.log(error)
+		return <Alert variant="light" color="red" title="Error loading scores">An error occured. Please try again later</Alert>
 	}
 
 	if (snapshot) {
 		const rows = snapshot.docs.map((doc, index) => (
-			<Table.Tr key={doc.id}>
+			<Table.Tr key = { doc.id } style={doc.data().uid == uid ? {fontWeight: 'bold'} : {}}>
 				<Table.Td>{index + 1}</Table.Td>
-				<Table.Td>{index == 0 ? `${doc.data().displayName} 👑` : doc.data().displayName}</Table.Td>
-				<Table.Td>{doc.data().wpm}</Table.Td>
-				<Table.Td>{doc.data().accuracy}%</Table.Td>
-			</Table.Tr>
+				<Table.Td>{doc.data().displayName}</Table.Td>
+				<Table.Td>{doc.data().uid}</Table.Td>
+				<Table.Td>{doc.data().wpm} WPM</Table.Td>
+				<Table.Td>{doc.data().timestamp}</Table.Td>
+			</Table.Tr >
 		));
 
 		return (
 			<>
+				{user == undefined
+					? ""
+					: rows.length == 0
+						? ""
+						: <Checkbox
+							label="Only show personal highscore"
+							checked={showPersonalScores}
+							onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
+						/>
+				}
 				{rows.length == 0
 					? <p><strong>The leaderbord is empty. Be the first!</strong></p>
 					: <Table style={{ marginBottom: '1em' }}>
 						<Table.Thead>
 							<Table.Tr>
 								<Table.Th>#</Table.Th>
-								<Table.Th>User</Table.Th>
-								<Table.Th>WPM</Table.Th>
-								<Table.Th>Accuracy</Table.Th>
+								<Table.Th>Username</Table.Th>
+								<Table.Th>UID</Table.Th>
+								<Table.Th>Speed</Table.Th>
+								<Table.Th>Date</Table.Th>
 							</Table.Tr>
 						</Table.Thead>
 						<Table.Tbody>{rows}</Table.Tbody>
 					</Table>
-				}
-				{props.user == undefined
-					? <Alert variant="light" color="blue" title="Not logged in">
-						Login or sign up to submit high score!
-					</Alert>
-					: rows.length == 0
-						? ""
-						: <Checkbox
-							label="Show personal highscore"
-							checked={showPersonalScores}
-							onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
-						/>
 				}
 			</>
 		)

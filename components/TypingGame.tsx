@@ -1,10 +1,11 @@
 import TextData from '../models/TextData'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
 import { db } from "../firebase.config"
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { User } from 'firebase/auth'
+import dayjs from 'dayjs'
 
 type Props = {
 	textData: TextData,
@@ -18,7 +19,7 @@ let errorCount = 0
 let currentWordErrorCount = 0
 
 export default function TypingGame(props: Props) {
-	
+
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
 	const [userInput, setUserInput] = useState("")
@@ -30,14 +31,23 @@ export default function TypingGame(props: Props) {
 	const [accuracy, setAccuracy] = useState(0)
 	const [writtenText, setWrittenText] = useState("")
 	const [errorText, setErrorText] = useState("")
+	const [currentHighscore, setCurrentHighscore] = useState(0)
 
 	const [snapshot, loading, error] = useCollection(
 		query(
 			collection(db, 'scores'),
-			where("textId", "==", textData.id),
-			where("userId", "==", props.user != null ? props.user.uid : "")
+			where("uid", "==", props.user != null ? props.user.uid : "")
 		)
 	);
+
+	useEffect(() => {
+		if (snapshot && props.user) {
+			if (snapshot.docs.length > 0) {
+				const storedWpm = snapshot.docs[0].data().wpm;
+				setCurrentHighscore(storedWpm)
+			}
+		}
+	}, [snapshot])
 
 	function resetGame() {
 		setTextData(props.textData)
@@ -133,22 +143,20 @@ export default function TypingGame(props: Props) {
 
 	function submitScore() {
 		if (snapshot == undefined || props.user == undefined) {
-			alert("Error submitting your score. Try again later.")
+			console.error("An error occured while submitting high score")
 			return;
 		}
+
+		const timestamp = dayjs().format("DD-MM-YYYY")
 		if (snapshot.docs.length == 0) {
 			addDoc(collection(db, "scores"), {
-				textId: textData.id,
-				userId: props.user.uid,
+				uid: props.user.uid,
 				displayName: props.user.displayName,
 				wpm: wpm,
-				accuracy: accuracy
+				timestamp: timestamp
 			})
-		} else {
-			const storedWpm = snapshot.docs[0].data().wpm;
-			if (wpm > storedWpm) {
-				updateDoc(snapshot.docs[0].ref, { wpm: wpm })
-			}
+		} else if (wpm > currentHighscore) {
+			updateDoc(snapshot.docs[0].ref, { wpm: wpm, timestamp: timestamp })
 		}
 		resetGame()
 	}
@@ -189,14 +197,30 @@ export default function TypingGame(props: Props) {
 			{seconds} s <br />
 			{gameFinished
 				? <Alert variant="light" color="blue" title="Game finished!" style={{ marginTop: '1em' }}>
-					<h3>WPM: {wpm}</h3>
-					<h3>Accuracy: {accuracy}% ({errorCount} errors)</h3>
-					<h3>Elapsed time: {seconds}s</h3>
-					{props.user != undefined
-						? <Button onClick={submitScore}>Submit score</Button>
-						: <Button onClick={resetGame}>Reset game</Button>
+					<h3>WPM: {wpm}<br />
+						Accuracy: {accuracy}% ({errorCount} errors)<br />
+						Elapsed time: {seconds}s</h3>
+					{props.user
+						? wpm > currentHighscore
+							? (
+								<>
+									<h3>New personal high score! 🎉</h3>
+									<Button onClick={submitScore}>Submit high score</Button>
+								</>
+							) : (
+								<>
+									<h3>Good effort! Your current high score is {currentHighscore} WPM</h3>
+									<Button onClick={resetGame}>New game</Button>
+								</>
+							)
+						: (
+							<>
+								<h3><i>You must be logged in to submit your high score</i></h3>
+								<Button onClick={resetGame}>New game</Button>
+							</>
+						)
 					}
-				</Alert>
+				</Alert >
 				: ""
 			}
 		</>

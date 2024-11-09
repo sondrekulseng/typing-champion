@@ -51,10 +51,13 @@ export default function Header() {
             <Box pb={30}>
                 <header className={classes.header}>
                     <Group justify="space-between">
-                        <Link href="/" style={{ color: 'white' }}><h2>Typing champion ✍️</h2></Link>
+                        <Link href="/"><h2>Typing champion ✍️</h2></Link>
                         <Group gap={0} visibleFrom="sm">
                             <Link href="/play/start" className={classes.link} style={pathname.includes('/play') ? { textDecoration: 'underline' } : {}}>
                                 <h3>Play</h3>
+                            </Link>
+                            <Link href="/leaderboard" className={classes.link} style={pathname.includes('/leaderboard') ? { textDecoration: 'underline' } : {}}>
+                                <h3>Leaderboard</h3>
                             </Link>
                             <Link href="/passwordReset" className={classes.link} style={pathname.includes('/passwordReset') ? { textDecoration: 'underline' } : {}}>
                                 <h3>Reset password</h3>
@@ -68,9 +71,9 @@ export default function Header() {
                                         {user.email}
                                         {user.uid == '2UxpMawI4YX1f6h75tgK4bx0ye43'
                                             ? (
-                                                <Button>
-                                                    <Link href='/admin'>Admin</Link>
-                                                </Button>
+                                                <Link href='/admin'>
+                                                    <Button>Admin</Button>
+                                                </Link>
                                             )
                                             : ""
                                         }

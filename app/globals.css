@@ -2,3 +2,11 @@ a {
     text-decoration: none;
     color: white;
 }
+
+td, tr {
+    font-size: 1.1em;
+}
+
+table {
+    margin-top: 2em;
+}

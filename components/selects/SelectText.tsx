@@ -29,7 +29,6 @@ export default function SelectText({ textId, setTextId }: Readonly<Props>) {
                 <Skeleton height={30} mt={6} />
             </>
         )
-
     }
 
     if (error) {
@@ -66,6 +65,7 @@ export default function SelectText({ textId, setTextId }: Readonly<Props>) {
                 ? options.find(op => op.value == textId)?.value
                 : ""
             }
+            maxDropdownHeight={'180px'}
             searchable
         />
     )

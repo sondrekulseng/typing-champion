@@ -21,8 +21,8 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme} forceColorScheme={'dark'}>
-          <div style={{ margin: 'auto', width: '80%' }}>
-            <Header />
+          <Header />
+          <div style={{ margin: 'auto', width: '70%' }}>
             {children}
           </div>
         </MantineProvider>

@@ -25,9 +25,9 @@ export default function Page() {
             return (
                 <>
                     <h2>Admin panel</h2>
-                    <Button>
-                        <Link href="admin/addText">Add text</Link>
-                    </Button>
+                    <Link href="admin/addText">
+                        <Button>Add text</Button>
+                    </Link>
                 </>
             )
         }
