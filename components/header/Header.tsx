@@ -104,19 +104,16 @@ export default function Header() {
                 >
                     <ScrollArea h={`calc(100vh - ${rem(80)})`} mx="-md">
                         <Divider my="sm" />
-
-                        <a href="#" className={classes.link}>
-                            Home
+                        <a href="/play/start" className={classes.link}>
+                            <h3>Play</h3>
                         </a>
-                        <a href="#" className={classes.link}>
-                            Learn
+                        <a href="/leaderboard" className={classes.link}>
+                            <h3>Leaderboard</h3>
                         </a>
-                        <a href="#" className={classes.link}>
-                            Academy
+                        <a href="/passwordReset" className={classes.link} >
+                            <h3>Reset password</h3>
                         </a>
-
                         <Divider my="sm" />
-
                         <Group justify="center" grow pb="xl" px="md">
                             {user
                                 ? "Logged in"
