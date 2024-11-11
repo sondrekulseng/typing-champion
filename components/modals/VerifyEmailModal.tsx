@@ -62,8 +62,8 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
             {!error && !sending
                 ? (
                     <>
-                        <p>A verificaiton link was sent to: <strong>{email}</strong><br/>
-                        Make sure to check your spam folder.
+                        <p>A verificaiton link was sent to: <strong>{email}</strong><br />
+                            Make sure to check your spam folder.
                         </p>
                         <Button onClick={verify} loading={verificationLoading}>I have verified my email</Button>
                     </>
