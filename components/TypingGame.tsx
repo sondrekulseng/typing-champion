@@ -170,11 +170,11 @@ export default function TypingGame(props: Props) {
 
 	return (
 		<>
-			<h3>
+			<h2>
 				<span style={{ backgroundColor: 'rgba(51, 170, 51, .6)' }}>{writtenText}</span>
 				<span style={{ backgroundColor: 'rgba(247, 2, 2, .6)' }}>{errorText}</span>
 				{textContent}
-			</h3>
+			</h2>
 			<TextInput
 				placeholder="Write in the text"
 				onChange={e => checkText(e.target.value)}

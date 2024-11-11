@@ -1,5 +1,5 @@
 import { auth } from "@/firebase.config";
-import { Alert, Button, Modal } from "@mantine/core";
+import { Alert, Button, Loader, Modal } from "@mantine/core";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useSendEmailVerification } from "react-firebase-hooks/auth";
 
@@ -8,25 +8,21 @@ type Props = {
     setOpen: Dispatch<SetStateAction<boolean>>,
     email: string
 }
+
+let EMAIL_SENT = false;
+
 export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Props>) {
 
-    const [emailSent, setEmailSent] = useState(false);
     const [verificationLoading, setVerifcationLoading] = useState(false);
     const [verificationError, setVerificationError] = useState(false);
     const [sendEmailVerification, sending, error] = useSendEmailVerification(auth);
 
     useEffect(() => {
-        setVerificationError(false)
-        setEmailSent(false)
-        setVerifcationLoading(false)
-    }, [open])
-
-    async function sendVerificationLink() {
-        const linkSent = await sendEmailVerification();
-        if (linkSent) {
-            setEmailSent(linkSent)
+        if (!EMAIL_SENT && open) {
+            sendEmailVerification()
+            EMAIL_SENT = true
         }
-    }
+    }, [open])
 
     async function verify() {
         if (auth.currentUser == null) {
@@ -49,45 +45,46 @@ export default function VerifyEmailModal({ open, setOpen, email }: Readonly<Prop
     async function closeAndSignOut() {
         await auth.signOut();
         setVerificationError(false);
+        setVerifcationLoading(false);
         setOpen(false);
     }
 
     return (
         <Modal opened={open} onClose={closeAndSignOut} closeOnClickOutside={false} title="Email verification" size="lg" overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}>
-            <h3>Please verify your email</h3>
-            <p>A verification link will be sent to: <strong>{email}</strong></p>
+            <h3>Check your email</h3>
+            {sending
+                ? <div style={{ display: "flex", alignItems: "center" }}>
+                    <Loader color="blue" size={'sm'} />
+                    <span style={{ marginLeft: "0.5em" }}>Sending verification email</span>
+                </div>
+                : ""
+            }
+            {!error && !sending
+                ? (
+                    <>
+                        <p>A verificaiton link was sent to: <strong>{email}</strong><br/>
+                        Make sure to check your spam folder.
+                        </p>
+                        <Button onClick={verify} loading={verificationLoading}>I have verified my email</Button>
+                    </>
+                ) : ""
+            }
             {error
                 ? (<>
-                    <Alert variant="light" color="red" title="Error sending email" style={{ marginBottom: '1em' }}>
+                    <Alert variant="light" color="red" title="Error sending email" style={{ marginBlock: '1em' }}>
                         An error occured while sending verificaiton email. Please try again.
                     </Alert>
+                    <Button onClick={sendEmailVerification}>Retry</Button>
                 </>)
                 : ""
             }
             {verificationError
                 ? (<>
-                    <Alert variant="light" color="red" title="Not verified" style={{ marginBottom: '1em' }}>
+                    <Alert variant="light" color="red" title="Not verified" style={{ marginTop: '1em' }}>
                         Email not verified. Please click the link in your email.
                     </Alert>
                 </>)
                 : ""
-            }
-            {emailSent
-                ? (
-                    <>
-                        <Alert variant="light" color="green" title="Email sent!" style={{ marginBottom: '1em' }} hidden={verificationError}>
-                            Make sure to check your spam folder
-                        </Alert>
-                        <Button onClick={verify} loading={verificationLoading}>I have clicked the link</Button>
-                        <p><i>Press ESC to abort and sign out</i></p>
-                    </>
-                )
-                : (
-                    <>
-                        <Button onClick={sendVerificationLink} loading={sending}>Send verifcation link</Button>
-                        <Button onClick={closeAndSignOut} color='#454545' style={{ marginLeft: '1em' }}>Cancel and sign out</Button>
-                    </>
-                )
             }
         </Modal>
     )
