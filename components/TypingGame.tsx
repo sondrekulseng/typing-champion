@@ -47,7 +47,7 @@ export default function TypingGame(props: Props) {
 				setCurrentHighscore(storedWpm)
 			}
 		}
-	}, [snapshot])
+	}, [snapshot, props.user])
 
 	function resetGame() {
 		setTextData(props.textData)

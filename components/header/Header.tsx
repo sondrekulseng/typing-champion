@@ -16,7 +16,7 @@ import SignUpModal from '../modals/SignUpModal';
 import VerifyEmailModal from '../modals/VerifyEmailModal';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState, useUpdateProfile } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase.config';
 import SignOutButton from '../buttons/SignOutButton';
 
@@ -25,9 +25,11 @@ export default function Header() {
     const [openLoginModal, setOpenLoginModal] = useState(false)
     const [openSignUpModal, setOpenSignUpModal] = useState(false)
     const [openVerifyEmailModal, setOpenVerifyEmailModal] = useState(false)
+    const [openCreateUsernameModal, setOpenCreateUsernameModal] = useState(false)
     const [userEmail, setUserEmail] = useState("")
     const pathname = usePathname()
     const [user, loading, error] = useAuthState(auth)
+    const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
 
     useEffect(() => {
         if (user == undefined || user == null) {
@@ -43,7 +45,21 @@ export default function Header() {
 
         if (!user.emailVerified) {
             setOpenVerifyEmailModal(true)
+            return
         }
+
+        user.reload().then(() => {
+            if (user.displayName == null) {
+                console.error("No display name exists on user!")
+                return
+            }
+            if (user.displayName.includes(" ")) {
+                const firstname = user.displayName.split(' ')[0]
+                updateProfile({ displayName: firstname })
+                    .then(() => user.reload().then().catch(() => console.error("Error reloading user data")))
+                    .catch(() => console.error("Error updating displayName"))
+            }
+        })
     }, [user])
 
     return (
@@ -69,7 +85,7 @@ export default function Header() {
                                 ? (
                                     <>
                                         {user.email}
-                                        {user.uid == '2UxpMawI4YX1f6h75tgK4bx0ye43'
+                                        {user.uid == 'vjSuDunjAAhOsySLIQlyjiHc0Co1'
                                             ? (
                                                 <Link href='/admin'>
                                                     <Button>Admin</Button>

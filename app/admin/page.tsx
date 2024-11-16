@@ -21,7 +21,7 @@ export default function Page() {
     }
 
     if (user) {
-        if (user.uid == '2UxpMawI4YX1f6h75tgK4bx0ye43') {
+        if (user.uid == 'vjSuDunjAAhOsySLIQlyjiHc0Co1') {
             return (
                 <>
                     <h2>Admin panel</h2>
