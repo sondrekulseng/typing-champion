@@ -4,10 +4,20 @@ import {
     Divider,
     Box,
     Burger,
+    Text,
     Drawer,
     ScrollArea,
     rem,
+    Avatar,
+    Menu,
+    UnstyledButton,
 } from '@mantine/core';
+import {
+    IconSettings,
+    IconChevronDown,
+    IconMail,
+    IconHelp,
+} from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
 import { useEffect, useState } from 'react';
@@ -30,6 +40,7 @@ export default function Header() {
     const pathname = usePathname()
     const [user, loading, error] = useAuthState(auth)
     const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
+    const [providerId, setProviderId] = useState("")
 
     useEffect(() => {
         if (user == undefined || user == null) {
@@ -47,6 +58,11 @@ export default function Header() {
             setOpenVerifyEmailModal(true)
             return
         }
+
+        setProviderId(user.providerData[0] != null
+            ? user.providerData[0].providerId
+            : "unknown"
+        )
 
         user.reload().then(() => {
             if (user.displayName == null) {
@@ -79,21 +95,64 @@ export default function Header() {
                                 <h3>Reset password</h3>
                             </Link>
                         </Group>
-
                         <Group visibleFrom="sm">
                             {user
                                 ? (
                                     <>
-                                        {user.email}
-                                        {user.uid == 'vjSuDunjAAhOsySLIQlyjiHc0Co1'
-                                            ? (
-                                                <Link href='/admin'>
-                                                    <Button>Admin</Button>
-                                                </Link>
-                                            )
-                                            : ""
-                                        }
-                                        <SignOutButton />
+                                        <Menu
+                                            width={260}
+                                            position="bottom-end"
+                                            transitionProps={{ transition: 'pop-top-right' }}
+                                            withinPortal
+                                        >
+                                            <Menu.Target>
+                                                <UnstyledButton>
+                                                    <Group gap={7}>
+                                                        <Avatar src={user.photoURL ? user.photoURL : '/avatar.png'} radius="xl" size={35} />
+                                                        <Text fw={500} size="lg" lh={1} mr={3}>
+                                                            {user.displayName}
+                                                        </Text>
+                                                        <IconChevronDown style={{ width: rem(12), height: rem(12) }} stroke={1.5} />
+                                                    </Group>
+                                                </UnstyledButton>
+                                            </Menu.Target>
+                                            <Menu.Dropdown>
+                                                <Menu.Label>Info</Menu.Label>
+                                                <Menu.Item
+                                                    leftSection={
+                                                        <IconMail style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                                                    }
+                                                >
+                                                    {user.email}
+                                                </Menu.Item>
+                                                <Menu.Label>Actions</Menu.Label>
+                                                {user.uid == 'vjSuDunjAAhOsySLIQlyjiHc0Co1'
+                                                    ? <Link href="/admin">
+                                                        <Menu.Item
+                                                            leftSection={
+                                                                <IconSettings style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                                                            }
+                                                        >
+                                                            Admin panel
+                                                        </Menu.Item>
+                                                    </Link>
+                                                    : ""
+                                                }
+                                                {providerId == 'password'
+                                                    ? <Link href="/passwordReset">
+                                                        <Menu.Item
+                                                            leftSection={
+                                                                <IconHelp style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                                                            }
+                                                        >
+                                                            Reset password
+                                                        </Menu.Item>
+                                                    </Link>
+                                                    : ""
+                                                }
+                                                <SignOutButton />
+                                            </Menu.Dropdown>
+                                        </Menu>
                                     </>
                                 )
                                 : (
@@ -104,7 +163,6 @@ export default function Header() {
                                 )
                             }
                         </Group>
-
                         <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
                     </Group>
                 </header>

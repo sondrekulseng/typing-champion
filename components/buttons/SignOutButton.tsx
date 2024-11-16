@@ -1,6 +1,7 @@
 import { useSignOut } from 'react-firebase-hooks/auth';
-import { Button } from '@mantine/core'
+import { Menu, rem } from '@mantine/core'
 import { auth } from "../../firebase.config"
+import { IconLogout } from '@tabler/icons-react';
 
 export default function SignOutButton() {
 
@@ -11,8 +12,14 @@ export default function SignOutButton() {
 	}
 
 	return (
-		<Button loading={loading} onClick={signOut} variant='default'>
+		<Menu.Item
+			color="red"
+			onClick={signOut}
+			leftSection={
+				<IconLogout style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+			}
+		>
 			Sign out
-		</Button>
+		</Menu.Item>
 	)
 }
