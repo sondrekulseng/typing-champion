@@ -1,5 +1,5 @@
 export default class ErrorUtils {
-	static parseError(errorMessage: string): string {
+	static parseError(errorMessage: string, provider?: string): string {
 		if (errorMessage.includes("auth/invalid-email")) {
 			return "Badly formatted email.";
 		}
@@ -14,6 +14,12 @@ export default class ErrorUtils {
 		}
 		if (errorMessage.includes("auth/weak-password")) {
 			return "Password should be at least 6 characters.";
+		}
+		if (errorMessage.includes("auth/popup-closed-by-user")) {
+			return "The authentication window was closed."
+		}
+		if (errorMessage.includes("auth/account-exists-with-different-credential")) {
+			return "Account already exists. Try signing with " + provider;
 		}
 		return "Unknown authentication error occured";
 	}

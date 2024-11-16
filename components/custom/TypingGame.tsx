@@ -1,8 +1,8 @@
-import TextData from '../models/TextData'
+import TextData from '../../models/TextData'
 import { useEffect, useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
-import { db } from "../firebase.config"
+import { db } from "../../firebase.config"
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { User } from 'firebase/auth'
 import dayjs from 'dayjs'

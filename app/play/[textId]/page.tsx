@@ -2,7 +2,7 @@
 
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db } from "../../../firebase.config"
-import TypingGame from '@/components/TypingGame';
+import TypingGame from '@/components/custom/TypingGame';
 import TextData from '../../../models/TextData';
 import { Paper, Skeleton } from '@mantine/core';
 import { useDocument } from 'react-firebase-hooks/firestore';

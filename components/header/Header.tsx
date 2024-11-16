@@ -17,6 +17,7 @@ import {
     IconChevronDown,
     IconMail,
     IconHelp,
+    IconTrash,
 } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './Header.module.css';
@@ -28,25 +29,34 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthState, useUpdateProfile } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase.config';
-import SignOutButton from '../buttons/SignOutButton';
+import SignOutMenuItem from '../menu/SignOutMenuItem';
+import DeleteAccountModal from '../modals/DeleteAccountModal';
 
 export default function Header() {
-    const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
     const [openLoginModal, setOpenLoginModal] = useState(false)
     const [openSignUpModal, setOpenSignUpModal] = useState(false)
     const [openVerifyEmailModal, setOpenVerifyEmailModal] = useState(false)
-    const [openCreateUsernameModal, setOpenCreateUsernameModal] = useState(false)
+    const [openDeleteAccountModal, setOpenDeleteAccountModal] = useState(false)
+
+    const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false)
     const [userEmail, setUserEmail] = useState("")
     const pathname = usePathname()
     const [user, loading, error] = useAuthState(auth)
-    const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth);
+    const [updateProfile, updating, errorUpdate] = useUpdateProfile(auth)
     const [providerId, setProviderId] = useState("")
 
     useEffect(() => {
         if (user == undefined || user == null) {
             setOpenVerifyEmailModal(false)
+            setOpenDeleteAccountModal(false)
             return
         }
+
+        const providerId = user.providerData[0] != null
+            ? user.providerData[0].providerId
+            : "password"
+
+        setProviderId(providerId)
 
         if (user.email != null) {
             setUserEmail(user.email)
@@ -54,15 +64,10 @@ export default function Header() {
             setOpenSignUpModal(false)
         }
 
-        if (!user.emailVerified) {
+        if (!user.emailVerified && providerId == "password") {
             setOpenVerifyEmailModal(true)
             return
         }
-
-        setProviderId(user.providerData[0] != null
-            ? user.providerData[0].providerId
-            : "unknown"
-        )
 
         user.reload().then(() => {
             if (user.displayName == null) {
@@ -108,7 +113,7 @@ export default function Header() {
                                             <Menu.Target>
                                                 <UnstyledButton>
                                                     <Group gap={7}>
-                                                        <Avatar src={user.photoURL ? user.photoURL : '/avatar.png'} radius="xl" size={35} />
+                                                        <Avatar src={user.photoURL ? user.photoURL : '/avatar.png'} radius="xl" size={35} style={{ marginTop: '0.3em' }} />
                                                         <Text fw={500} size="lg" lh={1} mr={3}>
                                                             {user.displayName}
                                                         </Text>
@@ -150,7 +155,16 @@ export default function Header() {
                                                     </Link>
                                                     : ""
                                                 }
-                                                <SignOutButton />
+                                                <SignOutMenuItem />
+                                                <Menu.Item
+                                                    color="red"
+                                                    leftSection={
+                                                        <IconTrash style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+                                                    }
+                                                    onClick={() => setOpenDeleteAccountModal(true)}
+                                                >
+                                                    Delete account
+                                                </Menu.Item>
                                             </Menu.Dropdown>
                                         </Menu>
                                     </>
@@ -205,6 +219,7 @@ export default function Header() {
                 setOpen={setOpenVerifyEmailModal}
                 email={userEmail}
             />
+            <DeleteAccountModal open={openDeleteAccountModal} setOpen={setOpenDeleteAccountModal} />
         </>
     );
 }
