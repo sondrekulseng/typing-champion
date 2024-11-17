@@ -131,7 +131,7 @@ export default function Header() {
                                                     {user.email}
                                                 </Menu.Item>
                                                 <Menu.Label>Actions</Menu.Label>
-                                                {user.uid == 'vjSuDunjAAhOsySLIQlyjiHc0Co1'
+                                                {user.uid == 'yNpB7NzO4TQ1g9hwmgQ1L15Jywq2'
                                                     ? <Link href="/admin">
                                                         <Menu.Item
                                                             leftSection={
@@ -180,7 +180,6 @@ export default function Header() {
                         <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
                     </Group>
                 </header>
-
                 <Drawer
                     opened={drawerOpened}
                     onClose={closeDrawer}

@@ -17,6 +17,7 @@ let correctChars = 0
 let wordCorrectCharIndex = 0
 let errorCount = 0
 let currentWordErrorCount = 0
+let textId = ""
 
 export default function TypingGame(props: Props) {
 
@@ -47,12 +48,17 @@ export default function TypingGame(props: Props) {
 				setCurrentHighscore(storedWpm)
 			}
 		}
+		if (props.textData.id != textId) {
+			textId = props.textData.id
+			resetGame()
+		}
 	}, [snapshot, props.user])
 
 	function resetGame() {
 		setTextData(props.textData)
 		setTextContent(props.textData.content)
 		setWrittenText("")
+		setErrorText("")
 		wordCount = 0
 		correctChars = 0
 		wordCorrectCharIndex = 0
@@ -62,6 +68,7 @@ export default function TypingGame(props: Props) {
 		setGameFinished(false)
 		setUserInput("")
 		clearInterval(intervalId)
+		setGameStarted(false);
 	}
 
 	function checkText(userInput: string) {
@@ -195,6 +202,7 @@ export default function TypingGame(props: Props) {
 				disabled={gameFinished}
 			/>
 			{seconds} s <br />
+			{gameStarted ? <Button onClick={resetGame} style={{marginTop: '1em'}}>Reset game</Button>: ""}
 			{gameFinished
 				? <Alert variant="light" color="blue" title="Game finished!" style={{ marginTop: '1em' }}>
 					<h3>WPM: {wpm}<br />
