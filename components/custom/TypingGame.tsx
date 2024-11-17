@@ -202,7 +202,7 @@ export default function TypingGame(props: Props) {
 				disabled={gameFinished}
 			/>
 			{seconds} s <br />
-			{gameStarted ? <Button onClick={resetGame} style={{marginTop: '1em'}}>Reset game</Button>: ""}
+			{gameStarted ? <Button onClick={resetGame} style={{ marginTop: '1em' }}>Reset game</Button> : ""}
 			{gameFinished
 				? <Alert variant="light" color="blue" title="Game finished!" style={{ marginTop: '1em' }}>
 					<h3>WPM: {wpm}<br />
