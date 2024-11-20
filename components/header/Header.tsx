@@ -88,7 +88,7 @@ export default function Header() {
             <Box pb={30}>
                 <header className={classes.header}>
                     <Group justify="space-between">
-                        <Link href="/"><h2>Typing champion ✍️</h2></Link>
+                        <Link href="/"><h2>Typing Champion ✍️</h2></Link>
                         <Group gap={0} visibleFrom="sm">
                             <Link href="/play/start" className={classes.link} style={pathname.includes('/play') ? { textDecoration: 'underline' } : {}}>
                                 <h3>Play</h3>

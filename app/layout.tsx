@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <head>
-        <title>Typing champion</title>
+        <title>Typing Champion</title>
         <link rel='icon' type='image/x-icon' href='/favicon.ico' />
       </head>
       <body>

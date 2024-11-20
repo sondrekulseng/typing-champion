@@ -7,8 +7,11 @@ export default function Page() {
 
   return (
     <>
-      <h3>Test your typing speed and compare against other opponents!</h3>
-      <Link href="/play/start"><Button>Start typing</Button></Link>
+      <h2>Welcome to Typing Champion</h2>
+      <h3>Test your typing speed and claim the champion title!</h3>
+      <Link href="/play/start">
+        <Button>Start typing</Button>
+      </Link>
     </>
   );
 }

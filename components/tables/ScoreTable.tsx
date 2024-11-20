@@ -58,8 +58,13 @@ export default function ScoreTable() {
 	}
 
 	if (snapshot) {
+		if (snapshot.docs.length == 0 && !showPersonalScores) {
+			return <Alert variant="light" color="blue" title="No scores yet">
+				The leaderboard is empty. Be the first!
+			</Alert>
+		}
 		const rows = snapshot.docs.map((doc, index) => (
-			<Table.Tr key = { doc.id } style={doc.data().uid == uid ? {fontWeight: 'bold'} : {}}>
+			<Table.Tr key={doc.id} style={doc.data().uid == uid ? { fontWeight: 'bold' } : {}}>
 				<Table.Td>{index + 1}</Table.Td>
 				<Table.Td>{doc.data().displayName}</Table.Td>
 				<Table.Td>{doc.data().uid}</Table.Td>
@@ -72,29 +77,34 @@ export default function ScoreTable() {
 			<>
 				{user == undefined
 					? ""
-					: rows.length == 0
-						? ""
-						: <Checkbox
-							label="Only show personal highscore"
-							checked={showPersonalScores}
-							onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
-						/>
+					: (
+						<>
+							{snapshot.docs.at(0)?.data().uid == user.uid && !showPersonalScores
+								? <Alert variant="light" color="blue" title="Congratulations!" style={{ marginBottom: '1em' }}>
+									You are the current champion! Here is your crown 👑
+								</Alert>
+								: ""
+							}
+							<Checkbox
+								label="Only show personal highscore"
+								checked={showPersonalScores}
+								onChange={evt => setShowPersonalScores(evt.currentTarget.checked)}
+							/>
+						</>
+					)
 				}
-				{rows.length == 0
-					? <p><strong>The leaderbord is empty. Be the first!</strong></p>
-					: <Table style={{ marginBottom: '1em' }}>
-						<Table.Thead>
-							<Table.Tr>
-								<Table.Th>#</Table.Th>
-								<Table.Th>Username</Table.Th>
-								<Table.Th>UID</Table.Th>
-								<Table.Th>Speed</Table.Th>
-								<Table.Th>Date</Table.Th>
-							</Table.Tr>
-						</Table.Thead>
-						<Table.Tbody>{rows}</Table.Tbody>
-					</Table>
-				}
+				<Table style={{ marginBottom: '1em' }}>
+					<Table.Thead>
+						<Table.Tr>
+							<Table.Th>#</Table.Th>
+							<Table.Th>Username</Table.Th>
+							<Table.Th>UID</Table.Th>
+							<Table.Th>Speed</Table.Th>
+							<Table.Th>Date</Table.Th>
+						</Table.Tr>
+					</Table.Thead>
+					<Table.Tbody>{rows}</Table.Tbody>
+				</Table>
 			</>
 		)
 	}
