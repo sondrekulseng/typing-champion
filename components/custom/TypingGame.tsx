@@ -6,6 +6,7 @@ import { db } from "../../firebase.config"
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { User } from 'firebase/auth'
 import dayjs from 'dayjs'
+import Styles from './TypingGame.module.css'
 
 type Props = {
 	textData: TextData,
@@ -23,6 +24,8 @@ export default function TypingGame(props: Props) {
 
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
+	const [typedText, setTypedText] = useState("")
+	const [mistypedText, setMistypedText] = useState("")
 	const [userInput, setUserInput] = useState("")
 	const [seconds, setSeconds] = useState(0)
 	const [gameStarted, setGameStarted] = useState(false)
@@ -30,8 +33,6 @@ export default function TypingGame(props: Props) {
 	const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>()
 	const [wpm, setWpm] = useState(0)
 	const [accuracy, setAccuracy] = useState(0)
-	const [writtenText, setWrittenText] = useState("")
-	const [errorText, setErrorText] = useState("")
 	const [currentHighscore, setCurrentHighscore] = useState(0)
 
 	const [snapshot, loading, error] = useCollection(
@@ -57,8 +58,8 @@ export default function TypingGame(props: Props) {
 	function resetGame() {
 		setTextData(props.textData)
 		setTextContent(props.textData.content)
-		setWrittenText("")
-		setErrorText("")
+		setTypedText("")
+		setMistypedText("")
 		wordCount = 0
 		correctChars = 0
 		wordCorrectCharIndex = 0
@@ -91,21 +92,21 @@ export default function TypingGame(props: Props) {
 			errorCount++
 			currentWordErrorCount++
 			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
-			setErrorText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setMistypedText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
 			return
 		}
 
 		if (userChar == answerChar) {
 			// Correct char is typed
 			correctChars++
-			setWrittenText(textData.content.slice(0, correctChars))
+			setTypedText(textData.content.slice(0, correctChars))
 			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			if (userChar == " ") {
 				wordCount++
 				setUserInput("")
 				wordCorrectCharIndex = 0
 				currentWordErrorCount = 0
-				setErrorText("")
+				setMistypedText("")
 			} else {
 				wordCorrectCharIndex++
 			}
@@ -119,7 +120,7 @@ export default function TypingGame(props: Props) {
 			setGameStarted(false)
 			setWpm(Math.round(wordCount / seconds * 60))
 			setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
-			setWrittenText(textData.content.slice(0, correctChars))
+			setTypedText(textData.content.slice(0, correctChars))
 			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			clearInterval(intervalId)
 			return
@@ -133,7 +134,7 @@ export default function TypingGame(props: Props) {
 		if (userChar != answerChar || currentWordErrorCount > 0) {
 			// Delete error char
 			currentWordErrorCount--
-			setErrorText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setMistypedText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
 			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
 			return
 		}
@@ -142,7 +143,7 @@ export default function TypingGame(props: Props) {
 			// Delete correct char
 			correctChars--
 			wordCorrectCharIndex--
-			setWrittenText(textData.content.slice(0, correctChars))
+			setTypedText(textData.content.slice(0, correctChars))
 			setTextContent(textData.content.slice(correctChars, textData.content.length))
 			return
 		}
@@ -178,8 +179,8 @@ export default function TypingGame(props: Props) {
 	return (
 		<>
 			<h2>
-				<span style={{ backgroundColor: 'rgba(51, 170, 51, .6)' }}>{writtenText}</span>
-				<span style={{ backgroundColor: 'rgba(247, 2, 2, .6)' }}>{errorText}</span>
+				<span className={Styles.typedText}>{typedText}</span>
+				<span className={Styles.mistypedText}>{mistypedText}</span>
 				{textContent}
 			</h2>
 			<TextInput
@@ -202,9 +203,9 @@ export default function TypingGame(props: Props) {
 				disabled={gameFinished}
 			/>
 			{seconds} s <br />
-			{gameStarted ? <Button onClick={resetGame} style={{ marginTop: '1em' }}>Reset game</Button> : ""}
+			{gameStarted ? <Button onClick={resetGame} className={Styles.marginTop}>Reset game</Button> : ""}
 			{gameFinished
-				? <Alert variant="light" color="blue" title="Game finished!" style={{ marginTop: '1em' }}>
+				? <Alert variant="light" color="blue" title="Game finished!" className={Styles.marginTop}>
 					<h3>WPM: {wpm}<br />
 						Accuracy: {accuracy}% ({errorCount} errors)<br />
 						Elapsed time: {seconds}s</h3>

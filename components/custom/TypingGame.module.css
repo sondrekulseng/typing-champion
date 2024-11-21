@@ -1,0 +1,11 @@
+.typedText {
+    background-color: rgba(51, 170, 51, .6);
+}
+
+.mistypedText {
+    background-color: rgba(247, 2, 2, .6);
+}
+
+.marginTop {
+    margin-top: 1em;
+}
