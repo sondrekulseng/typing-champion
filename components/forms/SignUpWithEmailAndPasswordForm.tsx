@@ -28,14 +28,6 @@ export default function SignUpWithEmailAndPasswordForm() {
         }
     }, [error]);
 
-    if (errorUpdate) {
-        console.log(errorUpdate)
-    }
-
-    if (updating) {
-        console.log(updating)
-    }
-
     async function handleSignUp(evt: FormEvent<HTMLFormElement>) {
         evt.preventDefault();
         const user = await createUserWithEmailAndPassword(email, password);

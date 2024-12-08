@@ -60,7 +60,6 @@ export default function ScoreTable({ timeLimit }: Readonly<Props>) {
 	}
 
 	if (error || userError) {
-		console.log(error)
 		return <Alert variant="light" color="red" title="Error loading scores">An error occured. Please try again later</Alert>
 	}
 

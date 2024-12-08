@@ -183,7 +183,6 @@ export default function TypingGame(props: Props) {
 
 	function startCountdown(initialSeconds: number) {
 
-		console.log("Started")
 		setRemainingSeconds(initialSeconds)
 
 		const intervalId = setInterval(() => {
