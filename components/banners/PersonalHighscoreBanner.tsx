@@ -1,19 +1,20 @@
 import { TimeLimit } from "@/enums/TimeLimit"
 import { db } from "@/firebase.config"
+import TimeLimitParser from "@/utils/TimeLimitParser"
 import { Alert } from "@mantine/core"
 import { query, collection, where, orderBy } from "firebase/firestore"
 import { useCollection } from "react-firebase-hooks/firestore"
 
 type Props = {
-    length: TimeLimit,
+    timeLimit: TimeLimit,
     uid: string
 }
-export default function PersonalHighscoreBanner({ length, uid }: Readonly<Props>) {
+export default function PersonalHighscoreBanner({ timeLimit, uid }: Readonly<Props>) {
 
     const [snapshot, loading, error] = useCollection(
         query(
             collection(db, 'scores'),
-            where('length', '==', length.toLowerCase()),
+            where('timeLimit', '==', TimeLimitParser.parseToSeconds(timeLimit)),
             where("uid", "==", uid),
             orderBy("wpm", "desc"),
         )

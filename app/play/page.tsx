@@ -65,7 +65,7 @@ export default function Page() {
                 }
             </Paper>
             {user
-                ? <PersonalHighscoreBanner length={timeLimit} uid={user.uid} />
+                ? <PersonalHighscoreBanner timeLimit={timeLimit} uid={user.uid} />
                 : <Alert variant="light" color="blue" title="Not logged in" style={{ marginTop: '1em' }}>
                     <h3>Login or sign up to submit your highscore</h3>
                 </Alert>
