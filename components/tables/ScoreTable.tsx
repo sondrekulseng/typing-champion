@@ -7,7 +7,10 @@ import { Table, Alert, Checkbox } from '@mantine/core'
 import { useState, useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-export default function ScoreTable() {
+type Props = {
+	length: string
+}
+export default function ScoreTable(props: Props) {
 
 	const RESULT_LIMIT = 20
 	const [uid, setUid] = useState("")
@@ -32,6 +35,7 @@ export default function ScoreTable() {
 			setScoreQuery(
 				query(
 					collection(db, 'scores'),
+					where('length', '==', props.length),
 					where("uid", "==", uid),
 					orderBy("wpm", "desc"),
 					limit(RESULT_LIMIT)
@@ -41,12 +45,13 @@ export default function ScoreTable() {
 			setScoreQuery(
 				query(
 					collection(db, 'scores'),
+					where('length', '==', props.length),
 					orderBy("wpm", "desc"),
 					limit(RESULT_LIMIT)
 				)
 			)
 		}
-	}, [showPersonalScores, user])
+	}, [showPersonalScores, user, props.length])
 
 	if (loading || userLoading) {
 		return <p>Loading scores...</p>
@@ -80,8 +85,8 @@ export default function ScoreTable() {
 					: (
 						<>
 							{snapshot.docs.at(0)?.data().uid == user.uid && !showPersonalScores
-								? <Alert variant="light" color="blue" title="Congratulations!" style={{ marginBottom: '1em' }}>
-									You are the current champion! Here is your crown 👑
+								? <Alert variant="light" color="green" title="Congratulations!" style={{ marginBottom: '1em' }}>
+									You are the champion in this category! Here is your crown 👑
 								</Alert>
 								: ""
 							}

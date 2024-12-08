@@ -1,10 +1,8 @@
 export default class TextData {
-	id: string;
 	title: string;
 	content: string;
 
-	public constructor(id: string, title: string, content: string) {
-		this.id = id;
+	public constructor(title: string, content: string) {
 		this.title = title;
 		this.content = content;
 	}

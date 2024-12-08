@@ -9,7 +9,7 @@ export default function Page() {
     <>
       <h2>Welcome to Typing Champion</h2>
       <h3>Test your typing speed and claim the champion title!</h3>
-      <Link href="/play/start">
+      <Link href="/play">
         <Button>Start typing</Button>
       </Link>
     </>

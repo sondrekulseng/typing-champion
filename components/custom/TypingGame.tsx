@@ -7,9 +7,11 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import { User } from 'firebase/auth'
 import dayjs from 'dayjs'
 import Styles from './TypingGame.module.css'
+import { TextLength } from '@/enums/TextLength'
 
 type Props = {
 	textData: TextData,
+	length: TextLength,
 	user: User | undefined | null
 }
 
@@ -18,12 +20,12 @@ let correctChars = 0
 let wordCorrectCharIndex = 0
 let errorCount = 0
 let currentWordErrorCount = 0
-let textId = ""
 
 export default function TypingGame(props: Props) {
 
 	const [textData, setTextData] = useState<TextData>(props.textData)
 	const [textContent, setTextContent] = useState(props.textData.content)
+	const [lengthCategory, setLengthCategory] = useState("")
 	const [typedText, setTypedText] = useState("")
 	const [mistypedText, setMistypedText] = useState("")
 	const [userInput, setUserInput] = useState("")
@@ -38,6 +40,7 @@ export default function TypingGame(props: Props) {
 	const [snapshot, loading, error] = useCollection(
 		query(
 			collection(db, 'scores'),
+			where("length", "==", lengthCategory),
 			where("uid", "==", props.user != null ? props.user.uid : "")
 		)
 	);
@@ -49,11 +52,11 @@ export default function TypingGame(props: Props) {
 				setCurrentHighscore(storedWpm)
 			}
 		}
-		if (props.textData.id != textId) {
-			textId = props.textData.id
+		if (props.length != lengthCategory) {
+			setLengthCategory(props.length)
 			resetGame()
 		}
-	}, [snapshot, props.user])
+	}, [snapshot, props.user, props.length])
 
 	function resetGame() {
 		setTextData(props.textData)
@@ -161,7 +164,8 @@ export default function TypingGame(props: Props) {
 				uid: props.user.uid,
 				displayName: props.user.displayName,
 				wpm: wpm,
-				timestamp: timestamp
+				timestamp: timestamp,
+				length: props.length.toLowerCase()
 			})
 		} else if (wpm > currentHighscore) {
 			updateDoc(snapshot.docs[0].ref, { wpm: wpm, timestamp: timestamp })

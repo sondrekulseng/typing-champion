@@ -90,7 +90,7 @@ export default function Header() {
                     <Group justify="space-between">
                         <Link href="/"><h2>Typing Champion ✍️</h2></Link>
                         <Group gap={0} visibleFrom="sm">
-                            <Link href="/play/start" className={classes.link} style={pathname.includes('/play') ? { textDecoration: 'underline' } : {}}>
+                            <Link href="/play" className={classes.link} style={pathname.includes('/play') ? { textDecoration: 'underline' } : {}}>
                                 <h3>Play</h3>
                             </Link>
                             <Link href="/leaderboard" className={classes.link} style={pathname.includes('/leaderboard') ? { textDecoration: 'underline' } : {}}>
