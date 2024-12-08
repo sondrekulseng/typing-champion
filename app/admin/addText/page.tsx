@@ -2,64 +2,53 @@
 
 import { TextLength } from "@/enums/TextLength";
 import { db } from "@/firebase.config";
-import { TextInput, Button, Textarea, Alert } from "@mantine/core";
-import { addDoc, collection, getCountFromServer, query, where } from "firebase/firestore";
-import { FormEvent, useEffect, useState } from "react"
+import { Button, Textarea, Alert } from "@mantine/core";
+import { collection, doc, documentId, getCountFromServer, query, setDoc, where } from "firebase/firestore";
+import { FormEvent, useState } from "react"
 
 export default function Page() {
 
-    const [length, setLength] = useState(TextLength.SHORT);
-    const [title, setTitle] = useState("");
-    const [textsByLength, setTextsByLength] = useState(
-        query(
-            collection(db, 'texts'),
-            where('length', '==', length)
-        )
-    );
+    const [lengthCategory, setLengthCategory] = useState(TextLength.SHORT);
+    const [length, setLength] = useState(0);
     const [content, setContent] = useState("");
     const [textSubmitted, setTextSubmitted] = useState(false);
 
-    useEffect(() => {
-        setTextsByLength(
-            query(
-                collection(db, 'texts'),
-                where('length', '==', length)
-            )
-        )
-    }, [length])
-
     function submitText(evt: FormEvent<HTMLFormElement>) {
         evt.preventDefault();
-        getCountFromServer(textsByLength)
+        const lengthFormatted = lengthCategory.toLowerCase();
+        getCountFromServer(
+            query(
+                collection(db, 'texts'),
+                where(documentId(), '>=', lengthFormatted),
+                where(documentId(), '<', lengthFormatted + '~')
+            ))
             .then(result => {
                 const lastIndex = result.data().count
-                addDoc(collection(db, "texts"), {
-                    length: length,
-                    title: title,
-                    content: content,
-                    index: lastIndex
-                })
+                setDoc(
+                    doc(db, "texts", lengthCategory.toLowerCase() + "-" + lastIndex),
+                    { content: content }
+                )
             })
-        setTitle("")
         setContent("")
         setTextSubmitted(true)
     }
 
     function handleContentChange(inputContent: string) {
         setContent(inputContent)
-        if (inputContent.length <= 300) {
-            setLength(TextLength.SHORT)
+        setLength(inputContent.length)
+        if (inputContent.length <= 150) {
+            setLengthCategory(TextLength.SHORT)
             return
         }
-        if (inputContent.length > 300 && inputContent.length <= 400) {
-            setLength(TextLength.MEDIUM)
+        if (inputContent.length > 150 && inputContent.length <= 250) {
+            setLengthCategory(TextLength.MEDIUM)
             return
         }
-        if (inputContent.length > 400 && inputContent.length < 500) {
-            setLength(TextLength.LONG)
+        if (inputContent.length > 250 && inputContent.length < 350) {
+            setLengthCategory(TextLength.LONG)
             return
         }
-        setLength(TextLength.INSANE)
+        setLengthCategory(TextLength.INSANE)
     }
 
 
@@ -67,9 +56,8 @@ export default function Page() {
         <>
             <h3>Add new text</h3>
             <form onSubmit={submitText}>
-                <TextInput label="Title" placeholder="My title" onChange={e => setTitle(e.target.value)} value={title} required />
                 <Textarea label="Content" placeholder="Content..." onChange={e => handleContentChange(e.target.value)} value={content} required />
-                <p>Text length: {length}</p>
+                <p>Length: {length} / category: {lengthCategory}</p>
                 {textSubmitted
                     ? (
                         <Alert variant="light" color="green" title="Success" style={{ marginTop: '1em' }}>

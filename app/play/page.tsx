@@ -5,7 +5,7 @@ import { auth, db } from "../../firebase.config"
 import TypingGame from '@/components/custom/TypingGame';
 import TextData from '../../models/TextData';
 import { Alert, Paper } from '@mantine/core';
-import { collection, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
+import { collection, documentId, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import PersonalHighscoreBanner from '@/components/banners/PersonalHighscoreBanner';
 import SelectTextLength from '@/components/selects/SelectTextLength';
@@ -16,13 +16,14 @@ export default function Page() {
     const [user] = useAuthState(auth)
     const [textData, setTextData] = useState<TextData>()
     const [loading, setLoading] = useState(true)
-    const [length, setLength] = useState(TextLength.SHORT)
+    const [lengthCategory, setLengthCategory] = useState(TextLength.SHORT)
 
     useEffect(() => {
         setLoading(true)
         const textsByLength = query(
             collection(db, 'texts'),
-            where('length', '==', length.toLowerCase())
+            where(documentId(), '>=', lengthCategory.toLowerCase()),
+            where(documentId(), '<', lengthCategory.toLowerCase() + '~')
         )
         getCountFromServer(textsByLength)
             .then(result => Math.floor(Math.random() * (result.data().count)))
@@ -30,7 +31,7 @@ export default function Page() {
                 getDocs(
                     query(
                         textsByLength,
-                        where('index', '==', randomIndex),
+                        where(documentId(), '==', lengthCategory.toLowerCase() + "-" + randomIndex),
                         limit(1)
                     ))
                     .then(result => {
@@ -49,19 +50,19 @@ export default function Page() {
                         setLoading(false);
                     })
             })
-    }, [length])
+    }, [lengthCategory])
 
     return (
         <div style={{ marginTop: '3em' }}>
-            <SelectTextLength setLength={setLength}></SelectTextLength>
+            <SelectTextLength setLength={setLengthCategory}></SelectTextLength>
             <Paper withBorder={true} style={{ padding: '1em', marginTop: '1em' }}>
                 {loading
                     ? "Loading..."
-                    : textData ? <TypingGame textData={textData} length={length.toLowerCase()} user={user} /> : "Error fetching textdata! Try another category"
+                    : textData ? <TypingGame textData={textData} length={lengthCategory.toLowerCase()} user={user} /> : "Error fetching textdata! Try another category"
                 }
             </Paper>
             {user
-                ? <PersonalHighscoreBanner length={length} uid={user.uid} />
+                ? <PersonalHighscoreBanner length={lengthCategory} uid={user.uid} />
                 : <Alert variant="light" color="blue" title="Not logged in" style={{ marginTop: '1em' }}>
                     <h3>Login or sign up to submit your highscore</h3>
                 </Alert>
