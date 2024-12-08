@@ -1,11 +1,11 @@
-import { TextLength } from "@/enums/TextLength"
+import { TimeLimit } from "@/enums/TimeLimit"
 import { db } from "@/firebase.config"
 import { Alert } from "@mantine/core"
 import { query, collection, where, orderBy } from "firebase/firestore"
 import { useCollection } from "react-firebase-hooks/firestore"
 
 type Props = {
-    length: TextLength,
+    length: TimeLimit,
     uid: string
 }
 export default function PersonalHighscoreBanner({ length, uid }: Readonly<Props>) {

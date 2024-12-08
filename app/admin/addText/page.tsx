@@ -1,31 +1,32 @@
 'use client'
 
-import { TextLength } from "@/enums/TextLength";
+import { TimeLimit } from "@/enums/TimeLimit";
 import { db } from "@/firebase.config";
+import TimeLimitParser from "@/utils/TimeLimitParser";
 import { Button, Textarea, Alert } from "@mantine/core";
 import { collection, doc, documentId, getCountFromServer, query, setDoc, where } from "firebase/firestore";
 import { FormEvent, useState } from "react"
 
 export default function Page() {
 
-    const [lengthCategory, setLengthCategory] = useState(TextLength.SHORT);
+    const [timeLimit, setTimeLimit] = useState(TimeLimit.HALF_MINUTE);
     const [length, setLength] = useState(0);
     const [content, setContent] = useState("");
     const [textSubmitted, setTextSubmitted] = useState(false);
 
     function submitText(evt: FormEvent<HTMLFormElement>) {
         evt.preventDefault();
-        const lengthFormatted = lengthCategory.toLowerCase();
+        const timeLimitFormatted = timeLimit.replace(" ", "-").toLowerCase()
         getCountFromServer(
             query(
                 collection(db, 'texts'),
-                where(documentId(), '>=', lengthFormatted),
-                where(documentId(), '<', lengthFormatted + '~')
+                where(documentId(), '>=', timeLimitFormatted),
+                where(documentId(), '<', timeLimitFormatted + '~')
             ))
             .then(result => {
-                const lastIndex = result.data().count
+                const index = result.data().count
                 setDoc(
-                    doc(db, "texts", lengthCategory.toLowerCase() + "-" + lastIndex),
+                    doc(db, "texts", TimeLimitParser.parseToDbKey(timeLimit, index)),
                     { content: content }
                 )
             })
@@ -36,19 +37,18 @@ export default function Page() {
     function handleContentChange(inputContent: string) {
         setContent(inputContent)
         setLength(inputContent.length)
-        if (inputContent.length <= 150) {
-            setLengthCategory(TextLength.SHORT)
+        if (inputContent.length <= 300) {
+            setTimeLimit(TimeLimit.HALF_MINUTE)
             return
         }
-        if (inputContent.length > 150 && inputContent.length <= 250) {
-            setLengthCategory(TextLength.MEDIUM)
+        if (inputContent.length > 300 && inputContent.length <= 600) {
+            setTimeLimit(TimeLimit.ONE_MINUTE)
             return
         }
-        if (inputContent.length > 250 && inputContent.length < 350) {
-            setLengthCategory(TextLength.LONG)
+        if (inputContent.length > 600) {
+            setTimeLimit(TimeLimit.TWO_MINUTES)
             return
         }
-        setLengthCategory(TextLength.INSANE)
     }
 
 
@@ -57,7 +57,7 @@ export default function Page() {
             <h3>Add new text</h3>
             <form onSubmit={submitText}>
                 <Textarea label="Content" placeholder="Content..." onChange={e => handleContentChange(e.target.value)} value={content} required />
-                <p>Length: {length} / category: {lengthCategory}</p>
+                <p>Length: {length} / category: {timeLimit}</p>
                 {textSubmitted
                     ? (
                         <Alert variant="light" color="green" title="Success" style={{ marginTop: '1em' }}>

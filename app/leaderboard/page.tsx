@@ -1,19 +1,19 @@
 'use client'
 
-import SelectTextLength from "@/components/selects/SelectTextLength";
+import SelectTimeLimit from "@/components/selects/SelectTextLength";
 import ScoreTable from "@/components/tables/ScoreTable";
-import { TextLength } from "@/enums/TextLength";
+import { TimeLimit } from "@/enums/TimeLimit";
 import { useState } from "react";
 
 export default function LeaderBoard() {
-    const [length, setLength] = useState(TextLength.SHORT)
+    const [timeLimit, setTimeLimit] = useState(TimeLimit.HALF_MINUTE)
     
     return (
         <>
             <h2>Leaderboard</h2>
-            <SelectTextLength setLength={setLength} />
+            <SelectTimeLimit defaultTime={timeLimit} setTimeLimit={setTimeLimit} />
             <br />
-            <ScoreTable length={length.toLowerCase()} />
+            <ScoreTable timeLimit={timeLimit} />
         </>
     )
 }

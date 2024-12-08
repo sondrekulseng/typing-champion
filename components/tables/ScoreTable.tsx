@@ -6,11 +6,13 @@ import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { Table, Alert, Checkbox } from '@mantine/core'
 import { useState, useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth';
+import TimeLimitParser from '@/utils/TimeLimitParser';
+import { TimeLimit } from '@/enums/TimeLimit';
 
 type Props = {
-	length: string
+	timeLimit: TimeLimit
 }
-export default function ScoreTable(props: Props) {
+export default function ScoreTable({ timeLimit }: Readonly<Props>) {
 
 	const RESULT_LIMIT = 20
 	const [uid, setUid] = useState("")
@@ -35,7 +37,7 @@ export default function ScoreTable(props: Props) {
 			setScoreQuery(
 				query(
 					collection(db, 'scores'),
-					where('length', '==', props.length),
+					where('timeLimit', '==', TimeLimitParser.parseToSeconds(timeLimit)),
 					where("uid", "==", uid),
 					orderBy("wpm", "desc"),
 					limit(RESULT_LIMIT)
@@ -45,13 +47,13 @@ export default function ScoreTable(props: Props) {
 			setScoreQuery(
 				query(
 					collection(db, 'scores'),
-					where('length', '==', props.length),
+					where('timeLimit', '==', TimeLimitParser.parseToSeconds(timeLimit)),
 					orderBy("wpm", "desc"),
 					limit(RESULT_LIMIT)
 				)
 			)
 		}
-	}, [showPersonalScores, user, props.length])
+	}, [showPersonalScores, user, timeLimit])
 
 	if (loading || userLoading) {
 		return <p>Loading scores...</p>

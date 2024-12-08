@@ -1,21 +1,22 @@
-import { TextLength } from "@/enums/TextLength";
+import { TimeLimit } from "@/enums/TimeLimit";
 import { SegmentedControl } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {
-    setLength: Dispatch<SetStateAction<TextLength>>
+    defaultTime: TimeLimit
+    setTimeLimit: Dispatch<SetStateAction<TimeLimit>>
 }
 
-export default function SelectTextLength({ setLength }: Readonly<Props>) {
+export default function SelectTimeLimit({ defaultTime, setTimeLimit: setTimeLimit }: Readonly<Props>) {
 
     return (
         <>
-            <h3>Select text length</h3>
+            <h3>Select duration</h3>
             <SegmentedControl
-                data={[TextLength.SHORT, TextLength.MEDIUM, TextLength.LONG, TextLength.INSANE]}
+                data={[TimeLimit.HALF_MINUTE, TimeLimit.ONE_MINUTE, TimeLimit.TWO_MINUTES]}
                 fullWidth={true}
-                defaultValue={'Short'}
-                onChange={(value => setLength(value as TextLength))}
+                defaultValue={defaultTime}
+                onChange={(value => setTimeLimit(value as TimeLimit))}
             />
         </>
     )

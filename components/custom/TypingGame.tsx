@@ -1,4 +1,3 @@
-import TextData from '../../models/TextData'
 import { useEffect, useState } from 'react'
 import { TextInput, Alert, Button } from '@mantine/core'
 import { collection, addDoc, query, where, updateDoc } from "firebase/firestore"
@@ -9,8 +8,8 @@ import dayjs from 'dayjs'
 import Styles from './TypingGame.module.css'
 
 type Props = {
-	textData: TextData,
-	length: string,
+	textContent: string,
+	timeLimit: number,
 	user: User | undefined | null
 }
 
@@ -22,13 +21,14 @@ let currentWordErrorCount = 0
 
 export default function TypingGame(props: Props) {
 
-	const [textData, setTextData] = useState<TextData>(props.textData)
-	const [textContent, setTextContent] = useState(props.textData.content)
-	const [lengthCategory, setLengthCategory] = useState("")
+	const FULL_TEXT = props.textContent;
+
+	const [remainingText, setRemainingText] = useState(FULL_TEXT)
+	const [timeLimit, setTimeLimit] = useState(props.timeLimit)
 	const [typedText, setTypedText] = useState("")
 	const [mistypedText, setMistypedText] = useState("")
 	const [userInput, setUserInput] = useState("")
-	const [seconds, setSeconds] = useState(0)
+	const [remainingSeconds, setRemainingSeconds] = useState(timeLimit)
 	const [gameStarted, setGameStarted] = useState(false)
 	const [gameFinished, setGameFinished] = useState(false)
 	const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>()
@@ -39,7 +39,7 @@ export default function TypingGame(props: Props) {
 	const [snapshot, loading, error] = useCollection(
 		query(
 			collection(db, 'scores'),
-			where("length", "==", lengthCategory),
+			where("timeLimit", "==", timeLimit),
 			where("uid", "==", props.user != null ? props.user.uid : "")
 		)
 	);
@@ -51,15 +51,14 @@ export default function TypingGame(props: Props) {
 				setCurrentHighscore(storedWpm)
 			}
 		}
-		if (props.length != lengthCategory) {
-			setLengthCategory(props.length)
+		if (props.timeLimit != timeLimit) {
+			setTimeLimit(props.timeLimit)
 			resetGame()
 		}
-	}, [snapshot, props.user, props.length])
+	}, [snapshot, props.user, props.timeLimit])
 
 	function resetGame() {
-		setTextData(props.textData)
-		setTextContent(props.textData.content)
+		setRemainingText(FULL_TEXT)
 		setTypedText("")
 		setMistypedText("")
 		wordCount = 0
@@ -67,7 +66,7 @@ export default function TypingGame(props: Props) {
 		wordCorrectCharIndex = 0
 		errorCount = 0
 		currentWordErrorCount = 0
-		setSeconds(0)
+		setRemainingSeconds(timeLimit)
 		setGameFinished(false)
 		setUserInput("")
 		clearInterval(intervalId)
@@ -76,33 +75,35 @@ export default function TypingGame(props: Props) {
 
 	function checkText(userInput: string) {
 		if (!gameStarted) {
-			startTimer()
+			if (timeLimit > 0) {
+				startCountdown(timeLimit)
+			}
 			setGameStarted(true)
 		}
 
-		if (currentWordErrorCount > 4 || correctChars + currentWordErrorCount === textData.content.length) {
+		if (currentWordErrorCount > 4 || correctChars + currentWordErrorCount === FULL_TEXT.length) {
 			// Block user from typing more errors
 			return
 		}
 
 		setUserInput(userInput)
 		const userChar = userInput.charAt(userInput.length - 1)
-		const answerChar = textData.content.charAt(correctChars)
+		const answerChar = FULL_TEXT.charAt(correctChars)
 
 		if (userChar != answerChar || currentWordErrorCount > 0) {
 			// Wrong char is typed
 			errorCount++
 			currentWordErrorCount++
-			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
-			setMistypedText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
+			setRemainingText(FULL_TEXT.slice(correctChars + currentWordErrorCount, FULL_TEXT.length))
+			setMistypedText(FULL_TEXT.slice(correctChars, correctChars + currentWordErrorCount))
 			return
 		}
 
 		if (userChar == answerChar) {
 			// Correct char is typed
 			correctChars++
-			setTypedText(textData.content.slice(0, correctChars))
-			setTextContent(textData.content.slice(correctChars, textData.content.length))
+			setTypedText(FULL_TEXT.slice(0, correctChars))
+			setRemainingText(FULL_TEXT.slice(correctChars, FULL_TEXT.length))
 			if (userChar == " ") {
 				wordCount++
 				setUserInput("")
@@ -114,30 +115,35 @@ export default function TypingGame(props: Props) {
 			}
 		}
 
-		if (correctChars == textData.content.length) {
+		if (correctChars == FULL_TEXT.length) {
 			// All chars has been typed
 			wordCount++;
-			setUserInput("")
-			setGameFinished(true)
-			setGameStarted(false)
-			setWpm(Math.round(wordCount / seconds * 60))
-			setAccuracy(Math.round(100 - (errorCount / textData.content.length * 100)))
-			setTypedText(textData.content.slice(0, correctChars))
-			setTextContent(textData.content.slice(correctChars, textData.content.length))
-			clearInterval(intervalId)
+			finishGame()
 			return
 		}
 	}
 
+	function finishGame() {
+		setUserInput("")
+		setGameFinished(true)
+		setGameStarted(false)
+		setWpm(Math.round(wordCount / timeLimit * 60))
+		setRemainingSeconds(timeLimit)
+		setAccuracy(Math.round(100 - (errorCount / FULL_TEXT.length * 100)))
+		setTypedText(FULL_TEXT.slice(0, correctChars))
+		setRemainingText(FULL_TEXT.slice(correctChars, FULL_TEXT.length))
+		clearInterval(intervalId)
+	}
+
 	function handleCharDelete(userInput: string) {
 		const userChar = userInput.charAt(userInput.length - 1)
-		const answerChar = textData.content.charAt(correctChars - 1)
+		const answerChar = FULL_TEXT.charAt(correctChars - 1)
 
 		if (userChar != answerChar || currentWordErrorCount > 0) {
 			// Delete error char
 			currentWordErrorCount--
-			setMistypedText(textData.content.slice(correctChars, correctChars + currentWordErrorCount))
-			setTextContent(textData.content.slice(correctChars + currentWordErrorCount, textData.content.length))
+			setMistypedText(FULL_TEXT.slice(correctChars, correctChars + currentWordErrorCount))
+			setRemainingText(FULL_TEXT.slice(correctChars + currentWordErrorCount, FULL_TEXT.length))
 			return
 		}
 
@@ -145,8 +151,8 @@ export default function TypingGame(props: Props) {
 			// Delete correct char
 			correctChars--
 			wordCorrectCharIndex--
-			setTypedText(textData.content.slice(0, correctChars))
-			setTextContent(textData.content.slice(correctChars, textData.content.length))
+			setTypedText(FULL_TEXT.slice(0, correctChars))
+			setRemainingText(FULL_TEXT.slice(correctChars, FULL_TEXT.length))
 			return
 		}
 	}
@@ -159,32 +165,48 @@ export default function TypingGame(props: Props) {
 
 		const timestamp = dayjs().format("DD-MM-YYYY")
 		if (snapshot.docs.length == 0) {
-			addDoc(collection(db, "scores"), {
-				uid: props.user.uid,
-				displayName: props.user.displayName,
-				wpm: wpm,
-				timestamp: timestamp,
-				length: props.length.toLowerCase()
-			})
+			addDoc(
+				collection(db, "scores"),
+				{
+					uid: props.user.uid,
+					displayName: props.user.displayName,
+					wpm: wpm,
+					timestamp: timestamp,
+					timeLimit: timeLimit
+				}
+			)
 		} else if (wpm > currentHighscore) {
 			updateDoc(snapshot.docs[0].ref, { wpm: wpm, timestamp: timestamp })
 		}
 		resetGame()
 	}
 
-	function startTimer() {
-		const intervalId = setInterval(() => {
-			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1) * 100) / 100);
-		}, 100);
-		setIntervalId(intervalId)
-	}
+	function startCountdown(initialSeconds: number) {
 
+		console.log("Started")
+		setRemainingSeconds(initialSeconds)
+
+		const intervalId = setInterval(() => {
+			setRemainingSeconds((prevSeconds) => {
+				const updatedSeconds = Math.round((prevSeconds - 0.1) * 100) / 100;
+
+				if (updatedSeconds <= 0) {
+					clearInterval(intervalId);
+					finishGame();
+				}
+
+				return updatedSeconds;
+			});
+		}, 100);
+
+		setIntervalId(intervalId); // Save the interval ID if needed for later
+	}
 	return (
 		<>
 			<h2>
 				<span className={Styles.typedText}>{typedText}</span>
 				<span className={Styles.mistypedText}>{mistypedText}</span>
-				{textContent}
+				{remainingText}
 			</h2>
 			<TextInput
 				placeholder="Write in the text"
@@ -201,17 +223,17 @@ export default function TypingGame(props: Props) {
 						e.preventDefault();
 					}
 				}}
-
+				style={{ marginTop: '2em' }}
 				value={userInput}
 				disabled={gameFinished}
 			/>
-			{seconds} s <br />
+			<h3>{remainingSeconds} s </h3>
 			{gameStarted ? <Button onClick={resetGame} className={Styles.marginTop}>Reset game</Button> : ""}
 			{gameFinished
 				? <Alert variant="light" color="blue" title="Game finished!" className={Styles.marginTop}>
 					<h3>WPM: {wpm}<br />
 						Accuracy: {accuracy}% ({errorCount} errors)<br />
-						Elapsed time: {seconds}s</h3>
+						Elapsed time: {remainingSeconds}s</h3>
 					{props.user
 						? wpm > currentHighscore
 							? (

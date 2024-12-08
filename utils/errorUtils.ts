@@ -1,4 +1,5 @@
 export default class ErrorUtils {
+
 	static parseError(errorMessage: string, provider?: string): string {
 		if (errorMessage.includes("auth/invalid-email")) {
 			return "Badly formatted email.";
@@ -23,4 +24,5 @@ export default class ErrorUtils {
 		}
 		return "Unknown authentication error occured";
 	}
+	
 }
