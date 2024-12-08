@@ -7,11 +7,10 @@ import { useCollection } from 'react-firebase-hooks/firestore'
 import { User } from 'firebase/auth'
 import dayjs from 'dayjs'
 import Styles from './TypingGame.module.css'
-import { TextLength } from '@/enums/TextLength'
 
 type Props = {
 	textData: TextData,
-	length: TextLength,
+	length: string,
 	user: User | undefined | null
 }
 

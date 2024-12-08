@@ -57,7 +57,7 @@ export default function Page() {
             <Paper withBorder={true} style={{ padding: '1em', marginTop: '1em' }}>
                 {loading
                     ? "Loading..."
-                    : textData ? <TypingGame textData={textData} length={length} user={user} /> : "Error fetching textdata! Try another category"
+                    : textData ? <TypingGame textData={textData} length={length.toLowerCase()} user={user} /> : "Error fetching textdata! Try another category"
                 }
             </Paper>
             {user
