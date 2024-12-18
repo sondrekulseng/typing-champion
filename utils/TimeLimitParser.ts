@@ -12,7 +12,7 @@ export default class TimeLimitParser {
 		if (timeLimit === "2 minutes") {
 			return 120;
 		}
-		return -1;
+		return 0;
 	}
 
 	static parseToDbKey(timeLimit: TimeLimit, index: number) {

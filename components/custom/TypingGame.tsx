@@ -10,6 +10,7 @@ import Styles from './TypingGame.module.css'
 type Props = {
 	textContent: string,
 	timeLimit: number,
+	showTimer: boolean,
 	user: User | undefined | null
 }
 
@@ -22,13 +23,17 @@ let currentWordErrorCount = 0
 export default function TypingGame(props: Props) {
 
 	const FULL_TEXT = props.textContent;
+	const PRACTISE_MODE = props.timeLimit == 0
+		? true
+		: false
 
 	const [remainingText, setRemainingText] = useState(FULL_TEXT)
 	const [timeLimit, setTimeLimit] = useState(props.timeLimit)
 	const [typedText, setTypedText] = useState("")
 	const [mistypedText, setMistypedText] = useState("")
 	const [userInput, setUserInput] = useState("")
-	const [remainingSeconds, setRemainingSeconds] = useState(timeLimit)
+	const [seconds, setSeconds] = useState(props.timeLimit)
+	const [elapsedSeconds, setElapsedSeconds] = useState(0)
 	const [gameStarted, setGameStarted] = useState(false)
 	const [gameFinished, setGameFinished] = useState(false)
 	const [intervalId, setIntervalId] = useState<NodeJS.Timeout | undefined>()
@@ -66,7 +71,7 @@ export default function TypingGame(props: Props) {
 		wordCorrectCharIndex = 0
 		errorCount = 0
 		currentWordErrorCount = 0
-		setRemainingSeconds(timeLimit)
+		setSeconds(props.timeLimit)
 		setGameFinished(false)
 		setUserInput("")
 		clearInterval(intervalId)
@@ -75,7 +80,9 @@ export default function TypingGame(props: Props) {
 
 	function checkText(userInput: string) {
 		if (!gameStarted) {
-			if (timeLimit > 0) {
+			if (PRACTISE_MODE) {
+				startTimer()
+			} else {
 				startCountdown(timeLimit)
 			}
 			setGameStarted(true)
@@ -124,11 +131,16 @@ export default function TypingGame(props: Props) {
 	}
 
 	function finishGame() {
+		if (PRACTISE_MODE) {
+			setWpm(Math.round(wordCount / seconds * 60))
+			setElapsedSeconds(seconds)
+		} else {
+			setWpm(Math.round(wordCount / timeLimit * 60))
+			setElapsedSeconds(timeLimit)
+		}
 		setUserInput("")
 		setGameFinished(true)
 		setGameStarted(false)
-		setWpm(Math.round(wordCount / timeLimit * 60))
-		setRemainingSeconds(timeLimit)
 		setAccuracy(Math.round(100 - (errorCount / FULL_TEXT.length * 100)))
 		setTypedText(FULL_TEXT.slice(0, correctChars))
 		setRemainingText(FULL_TEXT.slice(correctChars, FULL_TEXT.length))
@@ -181,12 +193,13 @@ export default function TypingGame(props: Props) {
 		resetGame()
 	}
 
-	function startCountdown(initialSeconds: number) {
 
-		setRemainingSeconds(initialSeconds)
+	// Ranked game
+	function startCountdown(initialSeconds: number) {
+		setSeconds(initialSeconds)
 
 		const intervalId = setInterval(() => {
-			setRemainingSeconds((prevSeconds) => {
+			setSeconds((prevSeconds) => {
 				const updatedSeconds = Math.round((prevSeconds - 0.1) * 100) / 100;
 
 				if (updatedSeconds <= 0) {
@@ -200,6 +213,15 @@ export default function TypingGame(props: Props) {
 
 		setIntervalId(intervalId); // Save the interval ID if needed for later
 	}
+
+	// Practise mode
+	function startTimer() {
+		const intervalId = setInterval(() => {
+			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1) * 100) / 100);
+		}, 100);
+		setIntervalId(intervalId)
+	}
+
 	return (
 		<>
 			<h2>
@@ -226,14 +248,14 @@ export default function TypingGame(props: Props) {
 				value={userInput}
 				disabled={gameFinished}
 			/>
-			<h3>{remainingSeconds} s </h3>
+			{props.showTimer ? <h3>{seconds} s </h3> : ""}
 			{gameStarted ? <Button onClick={resetGame} className={Styles.marginTop}>Reset game</Button> : ""}
 			{gameFinished
 				? <Alert variant="light" color="blue" title="Game finished!" className={Styles.marginTop}>
 					<h3>WPM: {wpm}<br />
 						Accuracy: {accuracy}% ({errorCount} errors)<br />
-						Elapsed time: {remainingSeconds}s</h3>
-					{props.user
+						Elapsed time: {elapsedSeconds}s</h3>
+					{props.user && !PRACTISE_MODE
 						? wpm > currentHighscore
 							? (
 								<>
@@ -248,7 +270,7 @@ export default function TypingGame(props: Props) {
 							)
 						: (
 							<>
-								<h3><i>You must be logged in to submit your high score</i></h3>
+								{!PRACTISE_MODE ? <h3><i>You must be logged in to submit your high score</i></h3> : ""}
 								<Button onClick={resetGame}>New game</Button>
 							</>
 						)

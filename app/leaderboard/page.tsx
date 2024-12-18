@@ -11,7 +11,7 @@ export default function LeaderBoard() {
     return (
         <>
             <h2>Leaderboard</h2>
-            <SelectTimeLimit defaultTime={timeLimit} setTimeLimit={setTimeLimit} />
+            <SelectTimeLimit defaultTime={timeLimit} onlyRanked={true} setTimeLimit={setTimeLimit} />
             <br />
             <ScoreTable timeLimit={timeLimit} />
         </>
