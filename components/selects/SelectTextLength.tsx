@@ -12,7 +12,7 @@ export default function SelectTimeLimit({ defaultTime, onlyRanked, setTimeLimit 
 
     const OPTIONS = onlyRanked
         ? [TimeLimit.HALF_MINUTE, TimeLimit.ONE_MINUTE, TimeLimit.TWO_MINUTES]
-        : [TimeLimit.PRACTISE, TimeLimit.HALF_MINUTE, TimeLimit.ONE_MINUTE, TimeLimit.TWO_MINUTES]
+        : [TimeLimit.PRACTICE, TimeLimit.HALF_MINUTE, TimeLimit.ONE_MINUTE, TimeLimit.TWO_MINUTES]
 
     return (
         <>

@@ -23,7 +23,7 @@ let currentWordErrorCount = 0
 export default function TypingGame(props: Props) {
 
 	const FULL_TEXT = props.textContent;
-	const PRACTISE_MODE = props.timeLimit == 0
+	const PRACTICE_MODE = props.timeLimit == 0
 		? true
 		: false
 
@@ -80,7 +80,7 @@ export default function TypingGame(props: Props) {
 
 	function checkText(userInput: string) {
 		if (!gameStarted) {
-			if (PRACTISE_MODE) {
+			if (PRACTICE_MODE) {
 				startTimer()
 			} else {
 				startCountdown(timeLimit)
@@ -131,7 +131,7 @@ export default function TypingGame(props: Props) {
 	}
 
 	function finishGame() {
-		if (PRACTISE_MODE) {
+		if (PRACTICE_MODE) {
 			setWpm(Math.round(wordCount / seconds * 60))
 			setElapsedSeconds(seconds)
 		} else {
@@ -214,7 +214,7 @@ export default function TypingGame(props: Props) {
 		setIntervalId(intervalId); // Save the interval ID if needed for later
 	}
 
-	// Practise mode
+	// Practice mode
 	function startTimer() {
 		const intervalId = setInterval(() => {
 			setSeconds(prevSeconds => Math.round((prevSeconds + 0.1) * 100) / 100);
@@ -255,7 +255,7 @@ export default function TypingGame(props: Props) {
 					<h3>WPM: {wpm}<br />
 						Accuracy: {accuracy}% ({errorCount} errors)<br />
 						Elapsed time: {elapsedSeconds}s</h3>
-					{props.user && !PRACTISE_MODE
+					{props.user && !PRACTICE_MODE
 						? wpm > currentHighscore
 							? (
 								<>
@@ -270,7 +270,7 @@ export default function TypingGame(props: Props) {
 							)
 						: (
 							<>
-								{!PRACTISE_MODE ? <h3><i>You must be logged in to submit your high score</i></h3> : ""}
+								{!PRACTICE_MODE ? <h3><i>You must be logged in to submit your high score</i></h3> : ""}
 								<Button onClick={resetGame}>New game</Button>
 							</>
 						)

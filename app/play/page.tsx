@@ -16,7 +16,7 @@ export default function Page() {
     const [user] = useAuthState(auth)
     const [textContent, setTextContent] = useState("")
     const [loading, setLoading] = useState(true)
-    const [timeLimit, setTimeLimit] = useState(TimeLimit.PRACTISE)
+    const [timeLimit, setTimeLimit] = useState(TimeLimit.PRACTICE)
     const [showTimer, setShowTimer] = useState(true)
 
     useEffect(() => {
@@ -58,9 +58,9 @@ export default function Page() {
                 onChange={event => setShowTimer(event.currentTarget.checked)}
                 style={{ marginTop: '1em' }}
             />
-            {timeLimit != TimeLimit.PRACTISE
+            {timeLimit != TimeLimit.PRACTICE
                 ? <h3>You have {timeLimit} to type as much as possible:</h3>
-                : <h3>Practise mode! Results do not count toward leadersboard</h3>
+                : <h3>Practice mode! Results do not count towards the leaderboard</h3>
             }
             <Paper withBorder={true} style={{ padding: '1em', marginTop: '1em' }}>
                 {loading
