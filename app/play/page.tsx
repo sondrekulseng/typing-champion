@@ -3,7 +3,7 @@
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db } from "../../firebase.config"
 import TypingGame from '@/components/custom/TypingGame';
-import { Alert, Paper, Switch } from '@mantine/core';
+import { Alert, Loader, Paper, Switch } from '@mantine/core';
 import { collection, documentId, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import PersonalHighscoreBanner from '@/components/banners/PersonalHighscoreBanner';
@@ -64,7 +64,7 @@ export default function Page() {
             }
             <Paper withBorder={true} style={{ padding: '1em', marginTop: '1em' }}>
                 {loading
-                    ? "Loading..."
+                    ? <Loader color="blue" />
                     : textContent
                         ? <TypingGame
                             textContent={textContent}
@@ -75,11 +75,15 @@ export default function Page() {
                         : "Error fetching textdata! Try another category"
                 }
             </Paper>
-            {user
-                ? <PersonalHighscoreBanner timeLimit={timeLimit} uid={user.uid} />
-                : <Alert variant="light" color="blue" title="Not logged in" style={{ marginTop: '1em' }}>
-                    <h3>Login or sign up to submit your highscore</h3>
-                </Alert>
+            {timeLimit != TimeLimit.PRACTICE
+                ? user
+                    ? <PersonalHighscoreBanner timeLimit={timeLimit} uid={user.uid} />
+                    : (
+                        <Alert variant="light" color="blue" title="Not logged in" style={{ marginTop: '1em' }}>
+                            <h3>Login or sign up to submit your highscore</h3>
+                        </Alert>
+                    )
+                : ""
             }
         </div>
     )

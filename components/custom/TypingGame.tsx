@@ -20,7 +20,7 @@ let wordCorrectCharIndex = 0
 let errorCount = 0
 let currentWordErrorCount = 0
 
-export default function TypingGame(props: Props) {
+export default function TypingGame(props: Readonly<Props>) {
 
 	const FULL_TEXT = props.textContent;
 	const PRACTICE_MODE = props.timeLimit == 0

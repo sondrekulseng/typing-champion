@@ -1,7 +1,7 @@
 import { TimeLimit } from "@/enums/TimeLimit"
 import { db } from "@/firebase.config"
 import TimeLimitParser from "@/utils/TimeLimitParser"
-import { Alert } from "@mantine/core"
+import { Alert, Skeleton } from "@mantine/core"
 import { query, collection, where, orderBy } from "firebase/firestore"
 import { useCollection } from "react-firebase-hooks/firestore"
 
@@ -21,7 +21,7 @@ export default function PersonalHighscoreBanner({ timeLimit, uid }: Readonly<Pro
     )
 
     if (loading) {
-        return "Loading personal highscore"
+        return <Skeleton height={100} radius="sm" style={{ marginTop: '1em' }} />
     }
 
     if (error) {
