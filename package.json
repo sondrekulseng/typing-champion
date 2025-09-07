@@ -15,7 +15,7 @@
     "@mantinex/dev-icons": "^2.0.0",
     "@tabler/icons-react": "^3.22.0",
     "dayjs": "^1.11.13",
-    "firebase": "^11.0.0",
+    "firebase": "^12.0.0",
     "next": "15.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
