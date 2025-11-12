@@ -10,3 +10,8 @@ td, tr {
 table {
     margin-top: 2em;
 }
+
+h4 {
+    padding-left: 2em;
+    padding-right: 2em;
+}
