@@ -89,7 +89,7 @@ export default function Header() {
                 <header className={classes.header}>
                     <Group justify="space-between">
                         <Link href="/"><h2>Typing Champion ✍️</h2></Link>
-                        <Group gap={0} visibleFrom="sm" >
+                        <Group gap={0} visibleFrom="sm">
                             <Link href="/play" className={classes.link} style={pathname.includes('/play') ? { textDecoration: 'underline' } : {}}>
                                 <h4>Play</h4>
                             </Link>
